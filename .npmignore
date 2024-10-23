@@ -1,0 +1,9 @@
+.git
+.DS_Store
+node_modules
+src/
+tests/
+README.md
+package.json
+tsconfig.json
+vite.config.ts
