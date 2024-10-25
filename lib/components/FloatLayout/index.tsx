@@ -5,7 +5,7 @@ import GlassEffect from '../GlassEffect.tsx';
 import {isTrue} from '../../utils';
 import Button from '../Buttons/Button.tsx';
 import Languages from '../Buttons/Languages.tsx';
-import QuickCategories from '~/components/lib/components/QuickCategories.tsx'
+import QuickCategories from '../QuickCategories.tsx'
 
 const CORNER_POSITION: Record<string | number, string[]> = {
   1: ['top', 'left'],

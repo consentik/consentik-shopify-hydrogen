@@ -3,9 +3,7 @@ import {isTrue} from '../utils';
 import Button from './Buttons/Button.tsx';
 import {
   CSSProperties,
-  useCallback,
   useContext,
-  useEffect,
   useMemo,
 } from 'react';
 import {BannerContext} from './Banner.tsx';
@@ -22,7 +20,6 @@ const Preferences = () => {
     },
     onClick,
     allowList,
-    setAllowList,
     onSelection,
   } = useContext<any>(BannerContext);
 

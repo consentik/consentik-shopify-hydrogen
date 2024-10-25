@@ -13,7 +13,6 @@ const SideLayout: FC = () => {
     metafield: {setting, cookieGroup},
     onClick,
     allowList,
-    setAllowList,
     onSelection,
   } = useContext<any>(BannerContext);
   const {cookies, category} = cookieGroup;
