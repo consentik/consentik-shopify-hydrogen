@@ -1,7 +1,7 @@
 import {CSSProperties, useContext, useMemo} from 'react';
 import {BannerContext} from '../Banner.tsx';
 import RenderIf from '../RenderIf.tsx';
-import {Reopenconf} from '~/components/lib/utils/types.ts';
+import {Reopenconf} from '../../utils/types.ts';
 
 const CookieButton = () => {
   const {
