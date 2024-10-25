@@ -5,7 +5,7 @@
   --cst-admin-secondary-color-fade: #005b2aaf;
 }
 
-.toggle-switch {
+.cst-toggle-switch {
   position: relative;
   width: 32px !important;
   display: inline-block;
@@ -64,7 +64,7 @@
   &-disabled {
     cursor: not-allowed;
 
-    .toggle-switch-inner {
+    .cst-toggle-switch-inner {
       &:before {
         background-color: var(--p-color-bg-fill-selected);
         cursor: not-allowed;
@@ -102,17 +102,17 @@
   }
 
   &-checkbox:checked + &-label {
-    .toggle-switch-inner {
+    .cst-toggle-switch-inner {
       margin-left: 0;
     }
 
-    .toggle-switch-switch {
+    .cst-toggle-switch-switch {
       right: 4px;
     }
   }
 }
 
-#consentik-backdrop {
+#cst-consentik-backdrop {
   overflow: hidden;
   position: absolute;
   width: 100%;
@@ -124,15 +124,16 @@
   cursor: not-allowed;
 }
 
-#consentik-cookie-banner {
-  .behavior-wrap {
+#cst-consentik-cookie-banner {
+  .cst-behavior-wrap {
     display: flex;
+    align-items: center;
     gap: 10px;
     position: absolute;
     right: 10px;
-    top: 8px;
+    top: 2px;
 
-    .close-icon {
+    .cst-close-icon {
       //position: absolute;
       right: 10px;
       top: 5px;
@@ -143,7 +144,7 @@
       cursor: pointer;
     }
 
-    .language-selector {
+    .cst-language-selector {
       text-align: center;
       display: flex;
       //position: absolute;
@@ -154,34 +155,34 @@
       width: auto;
       font-size: var(--cst-text-size);
 
-      .translation-icon {
+      .cst-translation-icon {
         fill: var(--cst-text-color);
       }
 
-      select {
+      .cst-language-select {
         color: var(--cst-text-color);
-        background: 0 0;
         padding: 4px;
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        background-color: var(--cst-bg);
 
-        option {
+        .cst-language-select option {
           color: var(--cst-text-color);
-          background: var(--cst-bg);
+          background-color: var(--cst-bg);
         }
       }
     }
 
   }
 
-  .buttons-group {
+  .cst-buttons-group {
     display: flex;
     gap: 10px;
     flex-direction: var(--cst-btn-direction);
   }
 
-  .otk-cookie-btn {
+  .cst-cookie-btn {
     cursor: pointer;
     position: fixed;
     bottom: 10px;
@@ -190,11 +191,11 @@
     width: fit-content;
     height: fit-content;
 
-    .btn-text {
+    .cst-btn-text {
       padding: 6px 16px;
     }
 
-    img {
+    img.cst-icon {
       height: auto;
       width: 24px;
       transition: 0.4s all;
@@ -209,10 +210,11 @@
     }
   }
 
-  .otk-btn {
+  .cst-btn {
     border: none;
     outline: none;
     border-radius: var(--cst-btn-radius);
+    font-size: var(--cst-text-size);
     min-width: 100px;
     padding: 6px 16px;
     cursor: pointer;
@@ -223,20 +225,32 @@
     width: auto;
     justify-content: center;
 
-    &.submit {
+    &.cst-allow {
+      color: var(--cst-allow-color);
+      background-color: var(--cst-allow-bg);
+      order: 5;
+    }
+
+    &.cst-allow-all {
+      color: var(--cst-allow-all-color);
+      background-color: var(--cst-allow-all-bg);
+      order: 6;
+    }
+
+    &.cst-submit {
       color: var(--cst-submit-color);
       background-color: var(--cst-submit-bg);
       order: var(--cst-submit-desktop-index)
     }
 
-    &.decline {
+    &.cst-decline {
       color: var(--cst-dismiss-color);
       background-color: var(--cst-dismiss-bg);
       order: var(--cst-dismiss-desktop-index);
 
     }
 
-    &.preference {
+    &.cst-preference {
       color: var(--cst-pref-color);
       background-color: var(--cst-pref-bg);
       order: var(--cst-pref-desktop-index);
@@ -269,7 +283,7 @@
     }
   }
 
-  .layout {
+  .cst-layout {
     position: fixed;
     overflow: hidden;
     z-index: 9999;
@@ -287,18 +301,18 @@
       box-sizing: border-box;
     }
 
-    .categories {
+    .cst-categories {
       height: 50%;
       overflow-y: auto;
 
-      .category-item {
+      .cst-category-item {
         text-align: left;
         color: var(--cst-text-color);
         font-size: var(--cst-text-size);
         margin: 10px 0;
         border-bottom: 1px solid var(--cst-banner-textcolor-fade);
 
-        .pane {
+        .cst-pane {
           transition: height 0.3s ease-out, opacity 0.3s ease-out;
           height: 0;
           opacity: 0;
@@ -367,7 +381,7 @@
           }
         }
 
-        &.active .pane {
+        &.cst-active .cst-pane {
           opacity: 1;
           height: 100%;
           animation: slideDown 0.5s forwards;
@@ -375,15 +389,16 @@
 
         }
 
-        .panel {
+        .cst-panel {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 10px;
           cursor: pointer;
 
-          .name {
+          .cst-name {
             font-weight: bold;
+            font-size: var(--cst-text-size);
             display: flex;
             flex: 1;
             align-items: center;
@@ -397,7 +412,7 @@
             }
           }
 
-          .actions {
+          .cst-actions {
             display: flex;
             gap: 10px;
 
@@ -409,7 +424,7 @@
       }
     }
 
-    .container {
+    .cst-container {
       position: relative;
       width: 100%;
       height: 100%;
@@ -420,8 +435,9 @@
       }
     }
 
-    .privacy-text {
+    .cst-privacy-text {
       color: var(--cst-privacy-color);
+      font-size: var(--cst-text-size);
       margin-left: 5px;
       text-decoration: unset;
 
@@ -430,21 +446,24 @@
       }
     }
 
-    .content {
+    .cst-content {
       margin-top: 20px;
       height: fit-content;
       display: var(--cst-content-display);
       flex-direction: column;
       align-items: center;
+      max-width: 73%;
 
-      .message, .title {
+      .cst-message, .cst-title {
         display: flex;
         color: var(--cst-text-color);
         font-size: var(--cst-text-size);
+        flex-direction: var(--cst-content-direction);
+        align-items: center;
       }
 
 
-      .title {
+      .cst-title {
         display: flex;
         gap: 5px;
         align-items: center;
@@ -452,7 +471,7 @@
       }
     }
 
-    .side {
+    .cst-side {
       overflow-y: auto;
       height: 100vh;
       padding-bottom: 100px;
@@ -493,7 +512,7 @@
         }
       }
 
-      .heading {
+      .cst-heading {
         color: var(--cst-text-color);
         text-align: left;
         font-size: var(--cst-text-size);
@@ -501,19 +520,19 @@
         margin: 15px 0;
       }
 
-      .message {
+      .cst-message {
         text-align: left;
       }
 
 
-      .content {
-        .title {
+      .cst-content {
+        .cst-title {
           justify-content: center;
           display: flex;
         }
       }
 
-      .buttons-group {
+      .cst-buttons-group {
         position: absolute;
         width: 100%;
         padding: 15px 10px;
@@ -530,28 +549,30 @@
       }
     }
 
-    .layout-preference {
-      .title {
+    .cst-layout-preference {
+      .cst-title {
         display: flex;
         justify-content: center;
       }
 
-      .message {
+      .cst-message {
         margin: 10px 0;
         text-align: left;
       }
 
-      .categories {
+      .cst-categories {
         height: auto;
         overflow-y: hidden;
       }
 
-      .heading {
+      .cst-heading {
         font-weight: bold;
         text-align: left;
+        font-size: var(--cst-text-size);
+        color: var(--cst-text-color);
       }
 
-      .scroll-area {
+      .cst-scroll-area {
         height: auto;
         max-height: 500px;
         overflow-y: auto;
@@ -561,7 +582,7 @@
         }
       }
 
-      .buttons-group {
+      .cst-buttons-group {
         flex-direction: row;
         align-items: center;
         justify-content: end;
@@ -569,27 +590,31 @@
       }
     }
 
-    .center {
+    .cst-center {
       display: flex;
       flex-direction: column;
       gap: 10px;
       padding: 15px;
 
-      .buttons-group {
+      .cst-privacy-text {
+        text-align: center;
+      }
+
+      .cst-buttons-group {
         flex-direction: row;
       }
 
-      .content {
+      .cst-content {
         margin-bottom: 10px;
         align-items: center;
         display: flex;
 
-        .message {
+        .cst-message {
           margin-top: 5px;
         }
       }
 
-      .buttons-group {
+      .cst-buttons-group {
         margin-top: 10px;
         justify-content: center;
 
@@ -600,15 +625,15 @@
       }
     }
 
-    .float {
+    .cst-float {
       padding: 15px;
 
-      .content {
+      .cst-content {
         display: flex;
         margin-bottom: 10px;
       }
 
-      .buttons-group {
+      .cst-buttons-group {
         align-items: center;
 
         button {
@@ -618,49 +643,50 @@
       }
     }
 
-    .full {
+    .cst-full {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-direction: var(--cst-text-direction);
       gap: 20px;
+      padding-top: var(--cst-full-padding);
     }
 
   }
 }
 
 @media (min-width: 768px) and (min-width: 850px) {
-  .consentik-cookie-banner {
-    .layout:has(.float) {
+  .cst-consentik-cookie-banner {
+    .cst-layout:has(.cst-float) {
       max-width: 70%;
     }
   }
 }
 
 @media screen and (max-width: 576px) {
-  .consentik-cookie-banner {
-    .otk-btn {
+  .cst-consentik-cookie-banner {
+    .cst-btn {
 
-      &.submit {
+      &.cst-submit {
         order: var(--cst-submit-mobile-index);
       }
 
-      &.decline {
+      &.cst-decline {
         order: var(--cst-dismiss-mobile-index);
 
       }
 
-      &.preference {
+      &.cst-preference {
         order: var(--cst-pref-mobile-index);
       }
     }
 
-    .layout {
+    .cst-layout {
       min-width: 100%;
       width: 100% !important;
 
-      .center {
-        .buttons-group {
+      .cst-center {
+        .cst-buttons-group {
           flex-direction: column;
           align-items: center;
 
@@ -670,12 +696,12 @@
         }
       }
 
-      .layout-preference {
-        .scroll-area {
+      .cst-layout-preference {
+        .cst-scroll-area {
           max-height: 50vh;
         }
 
-        .buttons-group {
+        .cst-buttons-group {
           flex-direction: column;
 
           button {
@@ -685,27 +711,27 @@
         }
       }
 
-      .float {
-        .buttons-wrap, .buttons-group {
+      .cst-float {
+        .cst-buttons-wrap, .cst-buttons-group {
           flex-direction: column;
         }
 
-        .buttons-group {
+        .cst-buttons-group {
           margin-top: 10px;
         }
       }
 
-      .full {
+      .cst-full {
         flex-direction: column;
         gap: 10px;
         align-items: center;
         justify-content: center;
 
-        .title {
+        .cst-title {
           justify-content: center;
         }
 
-        .buttons-group {
+        .cst-buttons-group {
           flex-direction: column;
           width: 100%;
           padding-bottom: 10px;
