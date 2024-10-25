@@ -8,7 +8,7 @@ interface TProps {
 }
 
 const Button: FC<TProps> = ({style, className, onClick, children}) => {
-    return <button style={style} className={`otk-btn ${className}`} onClick={onClick} role='button'>
+    return <button style={style} className={`cst-btn ${className}`} onClick={onClick} role='button'>
         {children}
     </button>
 }

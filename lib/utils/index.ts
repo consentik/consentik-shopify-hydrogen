@@ -50,11 +50,22 @@ export async function loadMetaObject({context}: LoaderFunctionArgs) {
                     value
                 }
             }
+            localization {
+                language {
+                    endonymName
+                    name
+                    isoCode
+                }
+            }
         }`;
-    const {metaobject} = await storefront.query(OBJECT_QUERY, {
+    const {metaobject, localization} = await storefront.query(OBJECT_QUERY, {
       cache: storefront.CacheNone(),
     });
-    return metaobject.field?.value ? JSON.parse(metaobject.field.value) : {};
+    const metafield = metaobject.field?.value
+      ? JSON.parse(metaobject.field.value)
+      : {};
+    const storeLang = localization.language.isoCode.toLowerCase();
+    return {banner: metafield, storeLang};
   } catch (e) {
     console.log('ERROR', e);
     return {};

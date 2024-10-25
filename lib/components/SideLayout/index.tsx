@@ -1,4 +1,4 @@
-import {CSSProperties, FC, useCallback, useContext, useMemo} from 'react';
+import {CSSProperties, FC, useContext, useMemo} from 'react';
 import {BannerContext} from '../Banner.tsx';
 import RenderIf from '../RenderIf.tsx';
 import GlassEffect from '../GlassEffect.tsx';
@@ -14,21 +14,9 @@ const SideLayout: FC = () => {
     onClick,
     allowList,
     setAllowList,
+    onSelection,
   } = useContext<any>(BannerContext);
   const {cookies, category} = cookieGroup;
-
-  const onSelection = useCallback(
-    (name: string, checked: boolean) => {
-      setAllowList((prev: string[]) => {
-        if (!checked) {
-          const names = prev.filter((i: string) => i !== name);
-          return [...new Set(names)];
-        }
-        return [...new Set([...prev, name])];
-      });
-    },
-    [allowList],
-  );
 
   const position = useMemo(() => {
     return {
@@ -85,6 +73,12 @@ const SideLayout: FC = () => {
                       key={`list_item_${index}`}
                       cookies={cookieItems}
                       item={item}
+                      showCount={isTrue(
+                        setting.advanced?.preferences_opts?.show_table,
+                      )}
+                      showTable={isTrue(
+                        setting.advanced?.preferences_opts?.show_table,
+                      )}
                     />
                   );
                 })}

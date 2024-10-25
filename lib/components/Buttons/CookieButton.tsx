@@ -9,7 +9,7 @@ const CookieButton = () => {
     const isGif = advancedSetting.button_icon_url && advancedSetting.button_icon_url.includes('.gif')
 
     const properties = useMemo(() => {
-        const [vertical, horizontal] = config.position?.split('-');
+        const [vertical, horizontal] = config ? config.position?.split('-') : ['bottom', 'right'];
         const radius = vertical === 'bottom' ? '10px 10px 0 0' : '0 0 10px 10px'
         return {
             [vertical]: config.displayAs == 'text' ? 0 : `${config.verticalMargin}px`,
@@ -18,12 +18,12 @@ const CookieButton = () => {
         } as CSSProperties
     }, [config]);
 
-    return <div onClick={() => onClick('reopen')} className='otk-cookie-btn' style={properties}>
+    return <div onClick={() => onClick('reopen')} className='cst-cookie-btn' style={properties}>
         <RenderIf cond={config.displayAs === 'icon'}>
-            <img src={advancedSetting.button_icon_url} alt='' data-gif={isGif ? "true" : ""}/>
+            <img className='cst-icon' src={advancedSetting.button_icon_url} alt='' data-gif={isGif ? "true" : ""}/>
         </RenderIf>
         <RenderIf cond={config.displayAs !== 'icon'}>
-            <div className='btn-text' style={{color: config.btnColor, background: config.btnBg}}>{config.btnText}</div>
+            <div className='cst-btn-text' style={{color: config.btnColor, background: config.btnBg}}>{config.btnText}</div>
         </RenderIf>
     </div>
 }

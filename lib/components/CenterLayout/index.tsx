@@ -5,6 +5,7 @@ import GlassEffect from '../GlassEffect.tsx';
 import {isTrue} from '../../utils';
 import Button from '../Buttons/Button.tsx';
 import Languages from '../Buttons/Languages.tsx';
+import QuickCategories from '~/components/lib/components/QuickCategories.tsx';
 
 const CenterLayout: FC = () => {
   const {
@@ -48,6 +49,9 @@ const CenterLayout: FC = () => {
             </div>
             <div className="cst-message">{setting.message}</div>
           </div>
+          <RenderIf cond={isTrue(setting.advanced.quick_show_category)}>
+            <QuickCategories />
+          </RenderIf>
           <a className="cst-privacy-text" href={setting.privacy_link}>
             {setting.info_text}
           </a>

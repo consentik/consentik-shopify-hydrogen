@@ -1,7 +1,13 @@
 import RenderIf from './RenderIf.tsx';
 import {isTrue} from '../utils';
 import Button from './Buttons/Button.tsx';
-import {CSSProperties, useCallback, useContext, useMemo} from 'react';
+import {
+  CSSProperties,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+} from 'react';
 import {BannerContext} from './Banner.tsx';
 import GlassEffect from './GlassEffect.tsx';
 import CategoryListItem from './CategoryListItem.tsx';
@@ -17,20 +23,8 @@ const Preferences = () => {
     onClick,
     allowList,
     setAllowList,
+    onSelection,
   } = useContext<any>(BannerContext);
-
-  const onSelection = useCallback(
-    (name: string, checked: boolean) => {
-      setAllowList((prev: string[]) => {
-        if (!checked) {
-          const names = prev.filter((i: string) => i !== name);
-          return [...new Set(names)];
-        }
-        return [...new Set([...prev, name])];
-      });
-    },
-    [allowList],
-  );
 
   const position = useMemo(() => {
     return {
@@ -88,11 +82,17 @@ const Preferences = () => {
                       );
                     return (
                       <CategoryListItem
+                        showTable={isTrue(
+                          setting.advanced.preferences_opts?.show_table,
+                        )}
+                        showCount={isTrue(
+                          setting.advanced.preferences_opts?.show_count,
+                        )}
                         opts={{
                           bg: setting.bgcolor_popup,
                           label: setting.popup_textcolor,
                         }}
-                        checked={allowList.includes(item.category_name)}
+                        checked={allowList.includes(item.name_consent)}
                         onClick={onSelection}
                         key={`category-${item.id}`}
                         cookies={cookieItems}

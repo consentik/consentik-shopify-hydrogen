@@ -5,6 +5,7 @@ import GlassEffect from '../GlassEffect.tsx';
 import {isTrue} from '../../utils';
 import Button from '../Buttons/Button.tsx';
 import Languages from '../Buttons/Languages.tsx';
+import QuickCategories from '~/components/lib/components/QuickCategories.tsx'
 
 const CORNER_POSITION: Record<string | number, string[]> = {
   1: ['top', 'left'],
@@ -59,6 +60,9 @@ const FloatBanner: FC = () => {
             </div>
             <div className="cst-message">{setting.message}</div>
           </div>
+          <RenderIf cond={isTrue(setting.advanced.quick_show_category)}>
+            <QuickCategories />
+          </RenderIf>
           <div
             className="cst-buttons-wrap"
             style={{

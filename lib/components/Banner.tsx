@@ -29,11 +29,11 @@ import {
   VisitorConsent,
   VisitorConsentCollected,
 } from '@shopify/hydrogen';
-import {useLoaderData} from '@remix-run/react';
 import '../style.css';
 
 interface TLoaderData {
   banner: IMetaField;
+  storeLang: string;
   consent: {storefrontAccessToken: string; checkoutDomain: string};
 }
 
@@ -50,7 +50,7 @@ export type TButtonType =
 
 interface IProps extends TLoaderData {}
 
-const Banner: FC<IProps> = ({banner, consent}) => {
+const Banner: FC<IProps> = ({banner, storeLang, consent}) => {
   // const {banner, consent} = useLoaderData<TLoaderData>();
   const {customerPrivacy} = useCustomerPrivacy({
     storefrontAccessToken: consent.storefrontAccessToken,
@@ -64,10 +64,10 @@ const Banner: FC<IProps> = ({banner, consent}) => {
   const [metafield, setMetaField] = useState<IMetaField | Record<string, any>>(
     banner,
   );
-
+  const [canShow, setCanShow] = useState(false);
   const [showBanner, setBannerShow] = useState<TBannerDisplay | null>('banner');
   const [allowList, setAllowList] = useState<string[]>([]);
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState(storeLang);
 
   const onClick = useCallback(
     async (btnType: TButtonType) => {
@@ -125,7 +125,18 @@ const Banner: FC<IProps> = ({banner, consent}) => {
     },
     [allowList, metafield.cookieGroup],
   );
-
+  const onSelection = useCallback(
+    (name: string, checked: boolean) => {
+      setAllowList((prev: string[]) => {
+        if (!checked) {
+          const names = prev.filter((i: string) => i !== name);
+          return [...new Set(names)];
+        }
+        return [...new Set([...prev, name])];
+      });
+    },
+    [allowList],
+  );
   const doLanguageChange = useCallback(
     (language: string) => {
       const bannerText = metafield.languages.bannerText.find(
@@ -207,23 +218,33 @@ const Banner: FC<IProps> = ({banner, consent}) => {
 
   useEffect(() => {
     const allowed = getCookie(CST_KEY.ALLOW_KEY);
+    const defaultSelection = banner.setting.advanced?.preferences_opts?.consent;
     if (allowed) {
       const selected = JSON.parse(allowed);
       setAllowList(selected.categoriesSelected);
+    } else {
+      setAllowList(defaultSelection || []);
     }
-  }, [showBanner]);
+  }, [showBanner, banner.setting.advanced.preferences_opts]);
+
+  useEffect(() => {
+    const isEnable = isTrue(banner.setting.app_enable);
+    const timeDelay = banner.setting.advanced.delay_show;
+    setTimeout(() => setCanShow(isEnable), timeDelay ? timeDelay * 1000 : 0);
+  }, [banner.setting]);
 
   useEffect(() => {
     const prevLang = getCookie(CST_KEY.LANGUAGE);
     const defaultLang =
-      prevLang || banner.languages?.config.default_language || 'en';
+      prevLang ||
+      storeLang ||
+      banner.languages?.config.default_language ||
+      'en';
     doLanguageChange(defaultLang);
   }, [banner.languages]);
 
   return (
-    <RenderIf
-      cond={isTrue(banner.setting?.app_enable) && metafield.canShowBanner}
-    >
+    <RenderIf cond={isTrue(banner.setting?.app_enable) && canShow}>
       <Fragment>
         <RenderIf
           cond={
@@ -249,6 +270,7 @@ const Banner: FC<IProps> = ({banner, consent}) => {
               doLanguageChange,
               language,
               setBannerShow,
+              onSelection,
             }}
           >
             <RenderIf cond={showBanner == 'preference'}>

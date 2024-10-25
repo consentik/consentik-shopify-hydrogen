@@ -1,4 +1,4 @@
+import Banner from './components/Banner';
+import ConsentikHead from './components/ConsentikHead';
 
-import Banner from './components/Banner'
-
-export {Banner}
+export {Banner, ConsentikHead};
