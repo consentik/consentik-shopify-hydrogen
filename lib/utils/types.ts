@@ -144,7 +144,7 @@ interface Datasaleopts {
   saleLabel: string;
 }
 
-interface Reopenconf {
+export interface Reopenconf {
   displayAs: string;
   btnText: string;
   position: string;

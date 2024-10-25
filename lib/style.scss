@@ -166,10 +166,9 @@
         border-radius: 4px;
         cursor: pointer;
 
-        .option {
+        option {
           color: var(--cst-text-color);
-          background-color: var(--cst-bg);
-
+          background: var(--cst-bg);
         }
       }
     }
