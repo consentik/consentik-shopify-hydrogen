@@ -12,7 +12,13 @@ import {
   useEffect,
   useState,
 } from 'react';
-import {CST_KEY, getCookie, isTrue, setCookie} from '../utils';
+import {
+  CST_KEY,
+  getCookie,
+  isTrue,
+  loadConsentSaved,
+  setCookie,
+} from '../utils';
 import RenderIf from './RenderIf';
 import {
   EFullLayout,
@@ -34,6 +40,7 @@ import '../style.css';
 interface TLoaderData {
   banner: IMetaField;
   storeLang: string;
+  bannerCanShow: boolean;
   consent: {storefrontAccessToken: string; checkoutDomain: string};
 }
 
@@ -50,7 +57,7 @@ export type TButtonType =
 
 interface IProps extends TLoaderData {}
 
-const Banner: FC<IProps> = ({banner, storeLang, consent}) => {
+const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
   // const {banner, consent} = useLoaderData<TLoaderData>();
   const {customerPrivacy} = useCustomerPrivacy({
     storefrontAccessToken: consent.storefrontAccessToken,
@@ -83,7 +90,7 @@ const Banner: FC<IProps> = ({banner, storeLang, consent}) => {
           });
           setCookie(
             CST_KEY.ALLOW_KEY,
-            JSON.stringify({categoriesSelected: ['necessary']}),
+            JSON.stringify({categoriesSelected: []}),
           );
           break;
         case 'allow_all':
@@ -221,23 +228,24 @@ const Banner: FC<IProps> = ({banner, storeLang, consent}) => {
       } as CSSProperties);
 
   useEffect(() => {
-    const allowed = getCookie(CST_KEY.ALLOW_KEY);
+    const allowed = loadConsentSaved();
     const defaultSelection = banner.setting.advanced?.preferences_opts?.consent;
     if (allowed) {
-      const selected = JSON.parse(allowed);
-      setAllowList(selected.categoriesSelected);
+      setAllowList(allowed.categoriesSelected);
     } else {
       setAllowList(defaultSelection || []);
     }
   }, [showBanner, banner.setting.advanced.preferences_opts]);
 
   useEffect(() => {
-    // const hasDecline = getCookie(CST_KEY.ALLOW_KEY);
-    const isEnable = isTrue(banner.setting.app_enable);
-    // const hideOnDismiss = isTrue(banner.setting.dismiss_hide_banner) && !!hasDecline;
+    const allowed = loadConsentSaved();
+
     const timeDelay = banner.setting.advanced.delay_show;
-    setTimeout(() => setCanShow(isEnable), timeDelay ? timeDelay * 1000 : 0);
-  }, [banner.setting]);
+    const hideOnDismiss = isTrue(banner.setting.dismiss_hide_banner);
+    const isDismissed = allowed?.categoriesSelected.length == 0;
+    const canShow = bannerCanShow && !isDismissed && hideOnDismiss;
+    setTimeout(() => setCanShow(canShow), timeDelay ? timeDelay * 1000 : 0);
+  }, [banner.setting, bannerCanShow]);
 
   useEffect(() => {
     const prevLang = getCookie(CST_KEY.LANGUAGE);

@@ -144,6 +144,23 @@ interface Datasaleopts {
   saleLabel: string;
 }
 
+export interface GeoLocationInfo {
+  userIf: {
+    country_code: string;
+    region: string;
+  };
+  ip: string;
+  country_code: string;
+  country_name: string;
+  region: string;
+  city_name: string;
+  latitude: number;
+  longitude: number;
+  zip_code: string;
+  time_zone: string;
+  language_code: string;
+}
+
 export interface Reopenconf {
   displayAs: string;
   btnText: string;
