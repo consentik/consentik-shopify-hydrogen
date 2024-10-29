@@ -180,7 +180,7 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
       setCookie(CST_KEY.LANGUAGE, language);
       setLanguage(language);
     },
-    [language, metafield.languages],
+    [language, banner.languages],
   );
 
   const {mobile, desktop} = banner.setting?.advanced?.buttons_position || {
@@ -218,10 +218,9 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
             : 25
         }px`,
         '--cst-text-direction': isFullWidth ? 'row' : 'column',
-        '--cst-content-display': isFullWidth ? 'block' : 'flex',
+        '--cst-content-display': isFullWidth ? 'flex' : 'block',
         '--cst-content-direction': isFullWidth ? 'row' : 'column',
-        '--cst-btn-direction':
-          !isFullWidth || banner.setting.popup_width > 60 ? 'row' : 'column',
+        '--cst-btn-direction': !isFullWidth || banner.setting.popup_width > 60 ? 'row' : 'column',
         '--cst-dismiss-desktop-index': desktop.dismiss,
         '--cst-pref-desktop-index': desktop.prefrences,
         '--cst-submit-desktop-index': desktop.submit,
@@ -255,13 +254,13 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
     let canShow = bannerCanShow;
     if (
       typeof window !== 'undefined' &&
-      HOME_PATHS.includes(window.location.pathname) &&
+      !HOME_PATHS.includes(window.location.pathname) &&
       homePageOnly
     ) {
       canShow = false;
     }
+
     if (isDismissed && hideOnDismiss) {
-      // canShow = false;
       setBannerShow('reopen');
     }
     setTimeout(() => setCanShow(canShow), timeDelay ? timeDelay * 1000 : 0);
@@ -269,12 +268,15 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
 
   useEffect(() => {
     const prevLang = getCookie(CST_KEY.LANGUAGE);
+    const tranEnabled = isTrue(banner.languages?.config.enable);
     const defaultLang =
       prevLang ||
       storeLang ||
       banner.languages?.config.default_language ||
       'en';
-    doLanguageChange(defaultLang);
+    if(tranEnabled){
+        doLanguageChange(defaultLang);
+    }
   }, [banner.languages]);
 
   return (
