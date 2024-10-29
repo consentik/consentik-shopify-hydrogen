@@ -74,7 +74,7 @@ const FloatBanner: FC = () => {
             <a className="cst-privacy-text" href={setting.privacy_link}>
               {setting.info_text}
             </a>
-            <div className="cst-buttons-group" style={{flexDirection: 'row'}}>
+            <div className="cst-buttons-group">
               <RenderIf cond={isTrue(setting.show_dismiss)}>
                 <Button
                   onClick={() => onClick('dismiss')}

@@ -188,6 +188,7 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
     desktop: {submit: 1, dismiss: 2, prefrences: 3},
   };
   const isFullWidth = banner.setting.popup_width > 50;
+  const hasTitle = !!banner.setting.title;
 
   const cstProperties = !banner.setting
     ? {}
@@ -219,8 +220,9 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
         }px`,
         '--cst-text-direction': isFullWidth ? 'row' : 'column',
         '--cst-content-display': isFullWidth ? 'flex' : 'block',
-        '--cst-content-direction': isFullWidth ? 'row' : 'column',
-        '--cst-btn-direction': !isFullWidth || banner.setting.popup_width > 60 ? 'row' : 'column',
+        '--cst-content-direction': isFullWidth && hasTitle ? 'row' : 'column',
+        '--cst-btn-direction':
+          !isFullWidth || banner.setting.popup_width > 60 ? 'row' : 'column',
         '--cst-dismiss-desktop-index': desktop.dismiss,
         '--cst-pref-desktop-index': desktop.prefrences,
         '--cst-submit-desktop-index': desktop.submit,
@@ -247,19 +249,20 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
 
   useEffect(() => {
     const allowed = loadConsentSaved();
-    const homePageOnly = isTrue(banner.setting.show_homepage);
+    // const adminMode = isTrue(banner.setting.advanced?.admin_mode);
+    // const setupMode = isTrue(banner.setting.advanced?.setup_mode);
+    const showHomePage = isTrue(banner.setting.show_homepage);
+    const homePageOnly =
+      typeof window !== 'undefined' &&
+      !HOME_PATHS.includes(window.location.pathname) &&
+      showHomePage;
     const timeDelay = banner.setting.advanced.delay_show;
     const hideOnDismiss = isTrue(banner.setting.dismiss_hide_banner);
     const isDismissed = allowed?.categoriesSelected.length == 0;
     let canShow = bannerCanShow;
-    if (
-      typeof window !== 'undefined' &&
-      !HOME_PATHS.includes(window.location.pathname) &&
-      homePageOnly
-    ) {
+    if (homePageOnly) {
       canShow = false;
     }
-
     if (isDismissed && hideOnDismiss) {
       setBannerShow('reopen');
     }
@@ -274,8 +277,8 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
       storeLang ||
       banner.languages?.config.default_language ||
       'en';
-    if(tranEnabled){
-        doLanguageChange(defaultLang);
+    if (tranEnabled) {
+      doLanguageChange(defaultLang);
     }
   }, [banner.languages]);
 
