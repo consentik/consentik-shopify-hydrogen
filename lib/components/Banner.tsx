@@ -98,7 +98,7 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
           setCookie(
             CST_KEY.ALLOW_KEY,
             JSON.stringify({
-              categoriesSelected: metafield.cookieGroup.category.map(
+              categoriesSelected: metafield?.cookieGroup?.category.map(
                 (item: ICategory) => item.category_name,
               ),
             }),
@@ -134,7 +134,7 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
           break;
       }
     },
-    [allowList, metafield.cookieGroup],
+    [allowList, metafield?.cookieGroup],
   );
   const onSelection = useCallback(
     (name: string, checked: boolean) => {

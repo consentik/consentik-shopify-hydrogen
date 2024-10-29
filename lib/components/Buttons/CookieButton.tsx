@@ -1,7 +1,7 @@
 import {CSSProperties, useContext, useMemo} from 'react';
 import {BannerContext} from '../Banner.tsx';
 import RenderIf from '../RenderIf.tsx';
-import {Reopenconf} from '~/components/lib/utils/types.ts';
+import {Reopenconf} from '../../utils/types.ts';
 
 const CookieButton = () => {
   const {
@@ -19,7 +19,7 @@ const CookieButton = () => {
   };
   const isGif =
     setting.advanced.button_icon_url &&
-    setting.advanced.button_icon_url.includes('.gif');
+    setting.advanced.button_icon_url?.includes('.gif');
   const properties = useMemo(() => {
     const [vertical, horizontal] = config.position.split('-');
     const radius = vertical === 'bottom' ? '10px 10px 0 0' : '0 0 10px 10px';

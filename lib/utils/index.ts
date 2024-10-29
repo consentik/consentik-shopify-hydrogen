@@ -1,8 +1,6 @@
 import {LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {GeoLocationInfo} from '~/components/lib/utils/types.ts';
-import banner from '~/components/lib/components/Banner.tsx';
-import {CST_EU_COUNTRIES} from '~/components/lib/utils/data.ts';
-import {VisitorConsentCollected} from '@shopify/hydrogen';
+import {GeoLocationInfo} from './types.ts';
+import {CST_EU_COUNTRIES} from './data.ts';
 
 export const CST_KEY = {
   LANGUAGE: '_consentik_s_lang',
@@ -71,7 +69,7 @@ export const getGeoRegion = async (shop: string): Promise<GeoLocationInfo> => {
       },
     };
   } catch (e) {
-    return this.getGeoRegionServer(shop);
+    return getGeoRegionServer(shop);
   }
 };
 export const getGeoRegionFromIp = async (ip: string): Promise<string> => {
@@ -131,18 +129,18 @@ export async function loadMetaObject({context}: LoaderFunctionArgs) {
 
     const appEnabled = isTrue(metafield.setting?.app_enable);
     const isShowAllRegion = isTrue(metafield.setting.show_all);
-    const listRegions = metafield.setting.show_specific_region;
+    const listRegions = metafield.setting.show_specific_region || [];
 
     if (
-      (!geo.region && listRegions.includes(CALIFORNIA)) ||
-      listRegions.includes(COLORADO)
+      (!geo.region && listRegions?.includes(CALIFORNIA)) ||
+      listRegions?.includes(COLORADO)
     ) {
       geo.region = await getGeoRegionFromIp(geo.ip || '');
     }
     const isInRegion =
       isShowAllRegion ||
       (!isShowAllRegion &&
-        listRegions.some((region) => isMatchRegion(geo, region)));
+        listRegions.some((region: string) => isMatchRegion(geo, region)));
     const bannerCanShow = isInRegion && appEnabled;
     return {banner: metafield, bannerCanShow, storeLang, shop};
   } catch (e) {
