@@ -36,6 +36,7 @@ import {
   VisitorConsentCollected,
 } from '@shopify/hydrogen';
 import '../style.css';
+import {HOME_PATHS} from '../utils/data.ts';
 
 interface TLoaderData {
   banner: IMetaField;
@@ -65,8 +66,16 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
     onVisitorConsentCollected: (consent: VisitorConsentCollected) =>
       console.log('CONNECTED', consent),
   });
-  const onPushConsent = (options: VisitorConsent) =>
-    customerPrivacy && customerPrivacy.setTrackingConsent(options, console.log);
+  const onPushConsent = useCallback(
+    (options: VisitorConsent) => {
+      if (!banner.setting?.isPaid) {
+        return;
+      }
+      customerPrivacy &&
+        customerPrivacy.setTrackingConsent(options, console.log);
+    },
+    [banner.setting?.isPaid],
+  );
 
   const [metafield, setMetaField] = useState<IMetaField | Record<string, any>>(
     banner,
@@ -239,11 +248,22 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
 
   useEffect(() => {
     const allowed = loadConsentSaved();
-
+    const homePageOnly = isTrue(banner.setting.show_homepage);
     const timeDelay = banner.setting.advanced.delay_show;
     const hideOnDismiss = isTrue(banner.setting.dismiss_hide_banner);
     const isDismissed = allowed?.categoriesSelected.length == 0;
-    const canShow = bannerCanShow && !isDismissed && hideOnDismiss;
+    let canShow = bannerCanShow;
+    if (
+      typeof window !== 'undefined' &&
+      HOME_PATHS.includes(window.location.pathname) &&
+      homePageOnly
+    ) {
+      canShow = false;
+    }
+    if (isDismissed && hideOnDismiss) {
+      // canShow = false;
+      setBannerShow('reopen');
+    }
     setTimeout(() => setCanShow(canShow), timeDelay ? timeDelay * 1000 : 0);
   }, [banner.setting, bannerCanShow]);
 

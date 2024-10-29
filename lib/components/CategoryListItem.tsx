@@ -1,5 +1,5 @@
 import {ICategory, ICookie} from '../utils/types.ts';
-import {FC, useState} from 'react';
+import {FC, useEffect, useState} from 'react';
 import SwitchBtn from './Buttons/Switch.tsx';
 import RenderIf from './RenderIf.tsx';
 
@@ -9,6 +9,7 @@ interface TProps {
   onClick: (name: string, checked: boolean) => void;
   checked: boolean;
   showTable: boolean;
+  defaultOpen?: boolean;
   showCount: boolean;
   opts?: {bg: string; label: string};
 }
@@ -21,8 +22,14 @@ const CategoryListItem: FC<TProps> = ({
   showCount,
   showTable,
   cookies,
+  defaultOpen = false,
 }) => {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(defaultOpen);
+  }, [defaultOpen]);
+
   return (
     <div className={`cst-category-item ${open ? 'cst-active' : ''}`}>
       <div className="cst-panel">

@@ -268,6 +268,9 @@
       background-color: var(--cst-dismiss-bg);
       order: var(--cst-dismiss-desktop-index);
 
+      &.index-initial {
+        order: 0;
+      }
     }
 
     &.cst-preference {
@@ -330,7 +333,10 @@
         color: var(--cst-text-color);
         font-size: var(--cst-text-size);
         margin: 10px 0;
-        border-bottom: 1px solid var(--cst-banner-textcolor-fade);
+
+        &:not(:last-child) {
+          border-bottom: 1px solid var(--cst-banner-textcolor-fade);
+        }
 
         .cst-pane {
           transition: height 0.3s ease-out, opacity 0.3s ease-out;
@@ -545,6 +551,8 @@
 
 
       .cst-content {
+        display: block;
+
         .cst-title {
           justify-content: center;
           display: flex;

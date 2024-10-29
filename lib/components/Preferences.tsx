@@ -1,11 +1,7 @@
 import RenderIf from './RenderIf.tsx';
 import {isTrue} from '../utils';
 import Button from './Buttons/Button.tsx';
-import {
-  CSSProperties,
-  useContext,
-  useMemo,
-} from 'react';
+import {CSSProperties, useContext, useMemo} from 'react';
 import {BannerContext} from './Banner.tsx';
 import GlassEffect from './GlassEffect.tsx';
 import CategoryListItem from './CategoryListItem.tsx';

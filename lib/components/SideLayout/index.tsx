@@ -6,7 +6,7 @@ import {isTrue} from '../../utils';
 import Button from '../Buttons/Button.tsx';
 import CategoryListItem from '../CategoryListItem.tsx';
 import Languages from '../Buttons/Languages.tsx';
-import {ICategory, ICookie} from '../../utils/types.ts';
+import type {ICategory, ICookie} from '../../utils/types.ts';
 
 const SideLayout: FC = () => {
   const {
@@ -57,27 +57,32 @@ const SideLayout: FC = () => {
             <div className="cst-categories">
               <div className="cst-heading">{setting.preferences_title}</div>
               {category &&
-                category.map((item: ICategory, index: number) => {
+                category.map((item: ICategory) => {
                   const cookieItems =
                     cookies &&
-                    cookies.filter((c: ICookie) => c.category_id === item.id);
+                    cookies.filter(
+                      (c: ICookie) =>
+                        c.category_id === item.id ||
+                        c.category_id === item.base_on,
+                    );
                   return (
                     <CategoryListItem
+                      defaultOpen={true}
+                      showTable={isTrue(
+                        setting.advanced.preferences_opts?.show_table,
+                      )}
+                      showCount={isTrue(
+                        setting.advanced.preferences_opts?.show_count,
+                      )}
                       opts={{
-                        bg: setting.popup_textcolor,
-                        label: setting.bgcolor_popup,
+                        bg: setting.bgcolor_popup,
+                        label: setting.popup_textcolor,
                       }}
-                      checked={allowList.includes(item.category_name)}
+                      checked={allowList.includes(item.name_consent)}
                       onClick={onSelection}
-                      key={`list_item_${index}`}
+                      key={`category-${item.id}`}
                       cookies={cookieItems}
                       item={item}
-                      showCount={isTrue(
-                        setting.advanced?.preferences_opts?.show_table,
-                      )}
-                      showTable={isTrue(
-                        setting.advanced?.preferences_opts?.show_table,
-                      )}
                     />
                   );
                 })}
@@ -88,18 +93,18 @@ const SideLayout: FC = () => {
             <RenderIf cond={isTrue(setting.show_dismiss_popup)}>
               <Button
                 onClick={() => onClick('dismiss')}
-                className="cst-decline"
+                className="cst-decline index-initial"
               >
                 {setting.dismiss_text}
               </Button>
             </RenderIf>
             <Button
-              onClick={() => onClick('preferences')}
-              className="cst-preference"
+              onClick={() => onClick('allow')}
+              className="cst-allow"
             >
               {setting.accept_selected_text}
             </Button>
-            <Button onClick={() => onClick('accept')} className="cst-submit">
+            <Button onClick={() => onClick('allow_all')} className="cst-allow-all">
               {setting.accept_all_text}
             </Button>
           </div>

@@ -1,3 +1,4 @@
+export const HOME_PATHS = ['/', '', '/home', '/dashboard', '/main'];
 export const CST_EU_COUNTRIES = [
   'BE',
   'BG',
