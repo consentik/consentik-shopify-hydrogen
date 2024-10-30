@@ -75,6 +75,7 @@ const Preferences = () => {
                       );
                     return (
                       <CategoryListItem
+                        defaultOpen={true}
                         showTable={isTrue(
                           setting.advanced.preferences_opts?.show_table,
                         )}

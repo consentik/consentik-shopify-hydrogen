@@ -15,14 +15,19 @@ import {
 import {
   CST_KEY,
   getCookie,
+  getUserAgent,
   isTrue,
   loadConsentSaved,
+  otUpdateDuration,
+  sendImpression,
   setCookie,
 } from '../utils';
 import RenderIf from './RenderIf';
 import {
   EFullLayout,
+  ETypeEvent,
   ETypePopup,
+  GeoLocationInfo,
   IBannerText,
   ICategory,
   ICookie,
@@ -37,8 +42,10 @@ import {
 } from '@shopify/hydrogen';
 import '../style.css';
 import {HOME_PATHS} from '../utils/data.ts';
+import {type} from 'os';
 
 interface TLoaderData {
+  geo: GeoLocationInfo;
   banner: IMetaField;
   storeLang: string;
   bannerCanShow: boolean;
@@ -58,7 +65,13 @@ export type TButtonType =
 
 interface IProps extends TLoaderData {}
 
-const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
+const Banner: FC<IProps> = ({
+  banner,
+  geo,
+  bannerCanShow,
+  storeLang,
+  consent,
+}) => {
   // const {banner, consent} = useLoaderData<TLoaderData>();
   const {customerPrivacy} = useCustomerPrivacy({
     storefrontAccessToken: consent.storefrontAccessToken,
@@ -80,15 +93,48 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
   const [metafield, setMetaField] = useState<IMetaField | Record<string, any>>(
     banner,
   );
+  const [pageInfo, setPageInfo] = useState<string>('page');
   const [canShow, setCanShow] = useState(false);
-  const [showBanner, setBannerShow] = useState<TBannerDisplay | null>('banner');
+  const [showBanner, setBannerShow] = useState<TBannerDisplay | null>('reopen');
   const [allowList, setAllowList] = useState<string[]>([]);
   const [language, setLanguage] = useState(storeLang);
+
+  const sendTrackingImpression = useCallback(
+    async (type: ETypeEvent) => {
+      if (type === ETypeEvent.show) {
+        window.otDurationDiff = 0;
+        window.otImpressionStartTime = Date.now();
+        window.otLastVisibleTime = window.otImpressionStartTime;
+        otUpdateDuration();
+      }
+      const userAgent = getUserAgent(geo.ip);
+      if (!document.hidden) {
+        window.otDurationDiff += Date.now() - window.otLastVisibleTime;
+      }
+      const duration =
+        window.otImpressionStartTime && !document.hidden
+          ? (window.otDurationDiff / 1000).toFixed(2)
+          : null;
+      await sendImpression({
+        shop: banner.setting.shop,
+        event: type,
+        category: allowList,
+        country: geo.country_code,
+        ip: geo.ip,
+        p: pageInfo,
+        ...userAgent,
+        dur: duration,
+      });
+    },
+    [allowList, pageInfo, geo, banner.setting],
+  );
 
   const onClick = useCallback(
     async (btnType: TButtonType) => {
       switch (btnType) {
         case 'close':
+          setBannerShow('reopen');
+          break;
         case 'dismiss':
           setBannerShow('reopen');
           await onPushConsent({
@@ -101,6 +147,7 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
             CST_KEY.ALLOW_KEY,
             JSON.stringify({categoriesSelected: []}),
           );
+          await sendTrackingImpression(ETypeEvent.declined);
           break;
         case 'allow_all':
         case 'accept':
@@ -108,7 +155,7 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
             CST_KEY.ALLOW_KEY,
             JSON.stringify({
               categoriesSelected: metafield?.cookieGroup?.category.map(
-                (item: ICategory) => item.category_name,
+                (item: ICategory) => item.name_consent,
               ),
             }),
           );
@@ -119,6 +166,7 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
             preferences: true,
             sale_of_data: true,
           });
+          await sendTrackingImpression(ETypeEvent.accepted);
           break;
         case 'allow':
           setCookie(
@@ -132,6 +180,7 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
             preferences: allowList.includes('preferences'),
             sale_of_data: false,
           });
+          await sendTrackingImpression(ETypeEvent.accepted_partial);
           break;
         case 'reopen':
           setBannerShow('banner');
@@ -248,6 +297,21 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
   }, [showBanner, banner.setting.advanced.preferences_opts]);
 
   useEffect(() => {
+    window.CST_ROOT_LINK = banner.setting.rootLink;
+    const path = encodeURI(window.location.pathname);
+    const [_, page] = path.split('/');
+    switch (page) {
+      case '':
+      case 'undefined':
+        setPageInfo('home');
+        break;
+      case 'collections':
+        setPageInfo('collection');
+        break;
+      case 'products':
+        setPageInfo('product');
+        break;
+    }
     const allowed = loadConsentSaved();
     // const adminMode = isTrue(banner.setting.advanced?.admin_mode);
     // const setupMode = isTrue(banner.setting.advanced?.setup_mode);
@@ -266,7 +330,15 @@ const Banner: FC<IProps> = ({banner, bannerCanShow, storeLang, consent}) => {
     if (isDismissed && hideOnDismiss) {
       setBannerShow('reopen');
     }
-    setTimeout(() => setCanShow(canShow), timeDelay ? timeDelay * 1000 : 0);
+    setTimeout(
+      () => {
+        if (canShow) {
+          sendTrackingImpression(ETypeEvent.show).then(() => {});
+        }
+        setCanShow(canShow);
+      },
+      timeDelay ? timeDelay * 1000 : 0,
+    );
   }, [banner.setting, bannerCanShow]);
 
   useEffect(() => {

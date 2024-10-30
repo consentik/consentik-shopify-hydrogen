@@ -217,7 +217,7 @@
 
     img.cst-icon {
       height: auto;
-      width: 24px;
+      width: 40px;
       transition: 0.4s all;
 
       &:hover {
@@ -328,6 +328,23 @@
       height: 50%;
       overflow-y: auto;
 
+      details {
+        summary {
+          margin-top: 5px;
+          list-style: none;
+          text-decoration: underline;
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: none;
+          }
+
+          &::-webkit-details-marker, &::marker {
+            display: none;
+          }
+        }
+      }
+
       .cst-category-item {
         text-align: left;
         color: var(--cst-text-color);
@@ -375,15 +392,15 @@
               border-bottom: 1px solid var(--cst-banner-textcolor-fade);
 
               dl {
-                display: inline-flex;
+                display: flex;
                 flex-wrap: wrap;
                 margin: 0;
                 font-size: var(--cst-text-size);
-
+                align-items: flex-start;
                 dt {
                   border: 0;
                   clear: both;
-                  display: block;
+                  //display: block;
                   flex: 0 1 30%;
                   //font-weight: 500;
                   line-height: 1.375;
@@ -396,7 +413,7 @@
                   flex: 0 1 70%;
                   border: 0;
                   clear: both;
-                  display: block;
+                  //display: block;
                   //font-weight: 500;
                   line-height: 1.375;
                   margin: 0 0 .5em;
@@ -742,7 +759,7 @@
 
       &:has(.cst-side) {
         max-height: 90%;
-        top:0;
+        top: 0;
         bottom: 0;
         min-width: 95% !important;
         width: 95% !important;

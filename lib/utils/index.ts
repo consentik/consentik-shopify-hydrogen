@@ -1,5 +1,5 @@
 import {LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {GeoLocationInfo} from './types.ts';
+import {GeoLocationInfo, ImpressionData, OptionalImpression} from './types.ts';
 import {CST_EU_COUNTRIES} from './data.ts';
 
 export const CST_KEY = {
@@ -86,6 +86,91 @@ export const getGeoRegionServer = async (
   return response.json();
 };
 
+export function getDeviceType() {
+  const userAgent = navigator.userAgent,
+    platform = navigator.platform,
+    macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+    windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+    iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+    android = /Android/i,
+    ipad = /iPad/i;
+
+  if (iosPlatforms.indexOf(platform) !== -1 || android.test(userAgent)) {
+    return 'm';
+  } else if (ipad.test(userAgent)) {
+    return 't';
+  } else if (
+    macosPlatforms.indexOf(platform) !== -1 ||
+    windowsPlatforms.indexOf(platform) !== -1
+  ) {
+    return 'd';
+  } else {
+    return 'unk';
+  }
+}
+
+function getBrowser() {
+  let userAgent = navigator.userAgent;
+  if (userAgent.indexOf('Firefox') !== -1) {
+    return 'Firefox';
+  } else if (userAgent.indexOf('OPR/') !== -1) {
+    return 'Opera';
+  } else if (userAgent.indexOf('Chrome') !== -1) {
+    return 'Chrome';
+  } else if (userAgent.indexOf('Safari') !== -1) {
+    return 'Safari';
+  } else if (userAgent.indexOf('Edg/') !== -1) {
+    return 'Edge';
+  } else if (
+    userAgent.indexOf('MSIE') !== -1 ||
+    userAgent.indexOf('Trident/') !== -1
+  ) {
+    return 'Internet Explorer';
+  }
+  return 'unk';
+}
+
+function uid(info: {ip: string; bw: string; dv: string}) {
+  const text = info.ip + info.bw + info.dv;
+  let hash = 0;
+  if (text.length === 0) return hash.toString(16);
+  for (let i = 0; i < text.length; i++) {
+    let char = text.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0;
+  }
+  return hash.toString(16).substring(0, 8);
+}
+
+export function getUserAgent(ip: string) {
+  const dv = getDeviceType();
+  const bw = getBrowser();
+  return {
+    dv,
+    bw,
+    uid: uid({ip, dv, bw}),
+  };
+}
+
+export async function sendImpression(data: OptionalImpression) {
+  try {
+    const params = new URLSearchParams({...data, dateCreated: new Date()});
+    return fetch(window.CST_ROOT_LINK + `/api/impression?${params}`);
+  } catch (e) {
+    console.log('CONSENTIK : Error sent impression');
+  }
+}
+
+export function otUpdateDuration() {
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      window.otDurationDiff += Date.now() - window.otLastVisibleTime;
+    } else {
+      window.otLastVisibleTime = Date.now();
+    }
+  });
+}
+
 export async function loadMetaObject({context}: LoaderFunctionArgs) {
   try {
     const {storefront, env} = context as any;
@@ -121,10 +206,11 @@ export async function loadMetaObject({context}: LoaderFunctionArgs) {
       },
     );
     const shop = node.primaryDomain.host;
-    const geo = await getGeoRegion(shop);
     const metafield = metaobject.field?.value
       ? JSON.parse(metaobject.field.value)
       : {};
+
+    const geo = await getGeoRegion(metafield.setting?.shop);
     const storeLang = localization.language.isoCode.toLowerCase();
 
     const appEnabled = isTrue(metafield.setting?.app_enable);
@@ -142,7 +228,7 @@ export async function loadMetaObject({context}: LoaderFunctionArgs) {
       (!isShowAllRegion &&
         listRegions.some((region: string) => isMatchRegion(geo, region)));
     const bannerCanShow = isInRegion && appEnabled;
-    return {banner: metafield, bannerCanShow, storeLang, shop};
+    return {banner: metafield, bannerCanShow, storeLang, geo, shop};
   } catch (e) {
     console.log('ERROR', e);
     return {};

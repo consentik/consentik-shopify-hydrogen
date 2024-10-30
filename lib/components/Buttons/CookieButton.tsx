@@ -10,8 +10,8 @@ const CookieButton = () => {
   } = useContext(BannerContext);
   const config: Reopenconf = setting.advanced.reopen_conf || {
     displayAs: 'icon',
-    verticalMargin: 0,
-    horizontalMargin: 0,
+    verticalMargin: 10,
+    horizontalMargin: 10,
     position: 'bottom-right',
     btnText: '',
     btnColor: '',
