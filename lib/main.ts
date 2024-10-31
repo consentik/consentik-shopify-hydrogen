@@ -1,5 +1,5 @@
 import Banner from './components/Banner';
-import ConsentikHead from './components/ConsentikHead';
+import CstScript from './components/CstScript';
 import {loadMetaObject} from './utils';
 
-export {Banner, ConsentikHead, loadMetaObject};
+export {Banner, CstScript, loadMetaObject};

@@ -36,13 +36,23 @@ import {
 import CookieButton from './Buttons/CookieButton.tsx';
 import Preferences from './Preferences.tsx';
 import {
+  ConsentStatus,
   useCustomerPrivacy,
   VisitorConsent,
   VisitorConsentCollected,
 } from '@shopify/hydrogen';
 import '../style.css';
 import {HOME_PATHS} from '../utils/data.ts';
-import {type} from 'os';
+import {
+  cstInitGPC,
+  cstSendGoogleConsent,
+  cstSendTracking,
+  cstUpdateEUT,
+  cstUpdateGCM,
+  cstUpdateSklik,
+  cstVariablesStyle,
+} from '../utils/core.ts';
+import cstUET from './CstUET.tsx';
 
 interface TLoaderData {
   geo: GeoLocationInfo;
@@ -99,34 +109,20 @@ const Banner: FC<IProps> = ({
   const [allowList, setAllowList] = useState<string[]>([]);
   const [language, setLanguage] = useState(storeLang);
 
+  const cstProperties = cstVariablesStyle(banner);
+
   const sendTrackingImpression = useCallback(
     async (type: ETypeEvent) => {
-      if (type === ETypeEvent.show) {
-        window.otDurationDiff = 0;
-        window.otImpressionStartTime = Date.now();
-        window.otLastVisibleTime = window.otImpressionStartTime;
-        otUpdateDuration();
-      }
-      const userAgent = getUserAgent(geo.ip);
-      if (!document.hidden) {
-        window.otDurationDiff += Date.now() - window.otLastVisibleTime;
-      }
-      const duration =
-        window.otImpressionStartTime && !document.hidden
-          ? (window.otDurationDiff / 1000).toFixed(2)
-          : null;
-      await sendImpression({
-        shop: banner.setting.shop,
-        event: type,
-        category: allowList,
-        country: geo.country_code,
-        ip: geo.ip,
-        p: pageInfo,
-        ...userAgent,
-        dur: duration,
-      });
+      const allowed = loadConsentSaved();
+      await cstSendTracking(
+        type,
+        banner.setting.shop,
+        geo,
+        pageInfo,
+        allowed?.categoriesSelected,
+      );
     },
-    [allowList, pageInfo, geo, banner.setting],
+    [pageInfo, geo, banner.setting],
   );
 
   const onClick = useCallback(
@@ -135,12 +131,15 @@ const Banner: FC<IProps> = ({
         case 'close':
           setBannerShow('reopen');
           break;
-        case 'dismiss':
+        case 'dismiss': {
           setBannerShow('reopen');
-          await onPushConsent({
+          const allowed = {
             analytics: false,
             marketing: false,
             preferences: false,
+          };
+          await onPushConsent({
+            ...allowed,
             sale_of_data: false,
           });
           setCookie(
@@ -148,17 +147,33 @@ const Banner: FC<IProps> = ({
             JSON.stringify({categoriesSelected: []}),
           );
           await sendTrackingImpression(ETypeEvent.declined);
+          cstUpdateGCM([], banner.integration.gcm);
+          cstUpdateEUT(
+            [],
+            banner.setting.fromPlus,
+            banner.setting.fromAdvanced,
+          );
+          cstUpdateSklik([], banner.integration.sklik);
           break;
+        }
         case 'allow_all':
-        case 'accept':
+        case 'accept': {
+          const allowed = metafield?.cookieGroup?.category.map(
+            (item: ICategory) => item.name_consent,
+          );
           setCookie(
             CST_KEY.ALLOW_KEY,
             JSON.stringify({
-              categoriesSelected: metafield?.cookieGroup?.category.map(
-                (item: ICategory) => item.name_consent,
-              ),
+              categoriesSelected: allowed,
             }),
           );
+          cstUpdateGCM(allowed, banner.integration.gcm);
+          cstUpdateEUT(
+            allowed,
+            banner.setting.fromPlus,
+            banner.setting.fromAdvanced,
+          );
+          cstUpdateSklik(allowed, banner.integration.sklik);
           setBannerShow('reopen');
           await onPushConsent({
             analytics: true,
@@ -168,7 +183,8 @@ const Banner: FC<IProps> = ({
           });
           await sendTrackingImpression(ETypeEvent.accepted);
           break;
-        case 'allow':
+        }
+        case 'allow': {
           setCookie(
             CST_KEY.ALLOW_KEY,
             JSON.stringify({categoriesSelected: allowList}),
@@ -180,8 +196,16 @@ const Banner: FC<IProps> = ({
             preferences: allowList.includes('preferences'),
             sale_of_data: false,
           });
+          cstUpdateGCM(allowList, banner.integration.gcm);
+          cstUpdateEUT(
+            allowList,
+            banner.setting.fromPlus,
+            banner.setting.fromAdvanced,
+          );
+          cstUpdateSklik(allowList, banner.integration.sklik);
           await sendTrackingImpression(ETypeEvent.accepted_partial);
           break;
+        }
         case 'reopen':
           setBannerShow('banner');
           break;
@@ -232,60 +256,6 @@ const Banner: FC<IProps> = ({
     [language, banner.languages],
   );
 
-  const {mobile, desktop} = banner.setting?.advanced?.buttons_position || {
-    mobile: {submit: 1, dismiss: 2, prefrences: 3},
-    desktop: {submit: 1, dismiss: 2, prefrences: 3},
-  };
-  const isFullWidth = banner.setting.popup_width > 50;
-  const hasTitle = !!banner.setting.title;
-
-  const cstProperties = !banner.setting
-    ? {}
-    : ({
-        '--cst-table-bg-th': banner.setting.popup_textcolor,
-        '--cst-table-color-th': banner.setting.bgcolor_popup,
-        '--cst-bg': banner.setting.bgcolor_popup,
-        '--cst-text-color': banner.setting.popup_textcolor,
-        '--cst-banner-textcolor-fade': banner.setting.popup_textcolor + '80',
-        '--cst-banner-bg-fade': banner.setting.popup_textcolor + '40',
-        '--cst-text-size': `${banner.setting.text_size}px`,
-        '--cst-submit-color': banner.setting.submit_textcolor,
-        '--cst-submit-bg': banner.setting.submit_bgcolor,
-        '--cst-dismiss-bg': banner.setting.dismiss_bgcolor,
-        '--cst-dismiss-color': banner.setting.dismiss_textcolor,
-        '--cst-pref-color': banner.setting.prefrences_textcolor,
-        '--cst-privacy-color': banner.setting.more_textcolor,
-        '--cst-pref-bg': banner.setting.prefrences_bgcolor,
-        '--cst-allow-bg': banner.setting.accept_selected_bgcolor,
-        '--cst-allow-color': banner.setting.accept_selected_text_color,
-        '--cst-allow-all-color': banner.setting.accept_all_text_color,
-        '--cst-allow-all-bg': banner.setting.accept_all_bgcolor,
-        '--cst-btn-radius': `${
-          banner.setting?.advanced?.border_style == 'sharp'
-            ? 0
-            : banner.setting?.advanced?.border_style == 'rounded'
-            ? 8
-            : 25
-        }px`,
-        '--cst-text-direction': isFullWidth ? 'row' : 'column',
-        '--cst-content-display': isFullWidth ? 'flex' : 'block',
-        '--cst-content-direction': isFullWidth && hasTitle ? 'row' : 'column',
-        '--cst-btn-direction':
-          !isFullWidth || banner.setting.popup_width > 60 ? 'row' : 'column',
-        '--cst-dismiss-desktop-index': desktop.dismiss,
-        '--cst-pref-desktop-index': desktop.prefrences,
-        '--cst-submit-desktop-index': desktop.submit,
-        '--cst-dismiss-mobile-index': mobile.dismiss,
-        '--cst-pref-mobile-index': mobile.prefrences,
-        '--cst-submit-mobile-index': mobile.submit,
-        '--cst-full-padding':
-          (isTrue(banner.languages?.config?.enable) && !isFullWidth
-            ? 25
-            : isFullWidth
-            ? 5
-            : 0) + 'px',
-      } as CSSProperties);
-
   useEffect(() => {
     const allowed = loadConsentSaved();
     const defaultSelection = banner.setting.advanced?.preferences_opts?.consent;
@@ -297,6 +267,11 @@ const Banner: FC<IProps> = ({
   }, [showBanner, banner.setting.advanced.preferences_opts]);
 
   useEffect(() => {
+    if (banner.setting.isPaid && isTrue(banner.setting.advanced.gpc)) {
+      //@ts-ignore
+      cstInitGPC(customerPrivacy);
+    }
+
     window.CST_ROOT_LINK = banner.setting.rootLink;
     const path = encodeURI(window.location.pathname);
     const [_, page] = path.split('/');
@@ -332,14 +307,17 @@ const Banner: FC<IProps> = ({
     }
     setTimeout(
       () => {
-        if (canShow) {
-          sendTrackingImpression(ETypeEvent.show).then(() => {});
-        }
         setCanShow(canShow);
       },
       timeDelay ? timeDelay * 1000 : 0,
     );
   }, [banner.setting, bannerCanShow]);
+
+  useEffect(() => {
+    if (banner && showBanner === 'banner') {
+      sendTrackingImpression(ETypeEvent.show).then(() => {});
+    }
+  }, [bannerCanShow, showBanner]);
 
   useEffect(() => {
     const prevLang = getCookie(CST_KEY.LANGUAGE);

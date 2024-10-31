@@ -1,5 +1,10 @@
 import {LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {GeoLocationInfo, ImpressionData, OptionalImpression} from './types.ts';
+import {
+  Gcm,
+  GeoLocationInfo,
+  ImpressionData,
+  OptionalImpression,
+} from './types.ts';
 import {CST_EU_COUNTRIES} from './data.ts';
 
 export const CST_KEY = {
@@ -154,8 +159,18 @@ export function getUserAgent(ip: string) {
 
 export async function sendImpression(data: OptionalImpression) {
   try {
-    const params = new URLSearchParams({...data, dateCreated: new Date()});
-    return fetch(window.CST_ROOT_LINK + `/api/impression?${params}`);
+    // const params = new URLSearchParams({...data, dateCreated: new Date()});
+    const queryParams = Object.keys(data)
+      .map((key) =>
+        Array.isArray(data[key])
+          ? data[key]
+              .map((value) => `${key}[]=${encodeURIComponent(value)}`)
+              .join('&')
+          : `${key}=${encodeURIComponent(data[key])}`,
+      )
+      .join('&');
+
+    return fetch(window.CST_ROOT_LINK + `/api/impression?${queryParams}`);
   } catch (e) {
     console.log('CONSENTIK : Error sent impression');
   }
@@ -262,3 +277,20 @@ export const loadConsentSaved = (): {
   }
   return JSON.parse(allowed);
 };
+
+export function cstGetCookie(name: string) {
+  const cookieName = name + '=';
+  const decodedCookie = decodeURIComponent(window.document.cookie);
+  const cookieArray = decodedCookie.split(';');
+
+  for (let i = 0; i < cookieArray.length; i++) {
+    let cookie = cookieArray[i];
+    while (cookie.charAt(0) === ' ') {
+      cookie = cookie.substring(1);
+    }
+    if (cookie.indexOf(cookieName) === 0) {
+      return cookie.substring(cookieName.length, cookie.length);
+    }
+  }
+  return '';
+}

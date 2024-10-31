@@ -4,6 +4,9 @@ export interface TMetaObject {
     namespace: string;
 }
 
+export interface AutoBlockOption{
+
+}
 export enum ETypeEvent {
     declined = 'DECLINED',
     show = 'SHOW',
@@ -30,8 +33,50 @@ export interface OptionalImpression extends Partial<ImpressionData>{}
 export interface IMetaField {
     canShowBanner: boolean;
     setting: IBanner;
+    integration: IIntegration;
     languages: ILanguage;
     cookieGroup: { category: ICategory[]; cookies: ICookie[] };
+}
+interface IIntegration {
+    sklik: string;
+    uet: string;
+    gcp: number;
+    gcm: Gcm;
+    autoBlock: AutoBlock;
+}
+interface AutoBlock {
+    id: number;
+    shop: string;
+    shopId: string;
+    googleTag: boolean;
+    googleAnalytics: boolean;
+    fbPixel: boolean;
+    youtube: boolean;
+    vimeo: boolean;
+    googleAds: boolean;
+    tiktok: boolean;
+    twitter: boolean;
+    pinterest: boolean;
+    custom: boolean;
+    customInclude?: any;
+    shopify: boolean;
+    webPixel: boolean;
+}
+export interface Gcm {
+    id: number;
+    shop: string;
+    shopId: string;
+    haveGtm: boolean;
+    gtm?: any;
+    securityStorage: boolean;
+    functionalityStorage: boolean;
+    personalizationStorage: boolean;
+    adUserData: boolean;
+    adPersonalization: boolean;
+    adStorage: boolean;
+    analyticsStorage: boolean;
+    adsDataRedaction: boolean;
+    urlPassthrough: boolean;
 }
 
 interface IBanner extends Settings {

@@ -210,19 +210,20 @@
     overflow: hidden;
     width: fit-content;
     height: fit-content;
+    transition: 0.4s all;
 
     .cst-btn-text {
       padding: 6px 16px;
     }
 
+    &:hover {
+      transform: scale(1.1);
+    }
+
     img.cst-icon {
       height: auto;
       width: 40px;
-      transition: 0.4s all;
 
-      &:hover {
-        transform: scale(1.1);
-      }
 
       &[data-gif="true"] {
         width: 45px;
@@ -397,6 +398,7 @@
                 margin: 0;
                 font-size: var(--cst-text-size);
                 align-items: flex-start;
+
                 dt {
                   border: 0;
                   clear: both;
