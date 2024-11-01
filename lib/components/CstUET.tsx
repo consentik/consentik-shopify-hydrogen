@@ -1,4 +1,5 @@
 import * as React from 'react';
+import CustomScript from './CustomScript.tsx'
 
 interface IProps {
   nonce?: string;
@@ -11,7 +12,7 @@ const CstUET: React.FC<IProps> = ({UET, nonce}): React.JSX.Element => {
     content = `!function(e,a,n,t,o){var c,r,d;e[o]=e[o]||[],c=function(){var a={ti:123,enableAutoSpaTracking:!0};a.q=e[o],e[o]=new UET(a),e[o].push("pageLoad")},(r=a.createElement(n)).src="//bat.bing.com/bat.js",r.async=1,r.onload=r.onreadystatechange=function(){var e=this.readyState;e&&"loaded"!==e&&"complete"!==e||(c(),r.onload=r.onreadystatechange=null)},(d=a.getElementsByTagName(n)[0]).parentNode.insertBefore(r,d)}(window,document,"script",0,"uetq");${content}`;
   }
   return (
-    <script
+    <CustomScript
       strategy="beforeInteractive"
       nonce={nonce}
       dangerouslySetInnerHTML={{

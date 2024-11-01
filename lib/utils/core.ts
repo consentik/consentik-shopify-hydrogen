@@ -14,8 +14,9 @@ const MARKETING = 'marketing';
 const ANALYTICS = 'analytics';
 const NECESSARY = 'necessary';
 const PREFERENCE = 'preferences';
+
 function _gtag(...args: any[]) {
-  window.dataLayer.push(arguments);
+  window.dataLayer.push(args);
 }
 
 export function cstUpdateEUT(
@@ -27,8 +28,7 @@ export function cstUpdateEUT(
     allowList.includes(MARKETING) || allowList.includes(ANALYTICS);
   const isValidPlan = isFromPremium || isFromAdvanced;
   //@ts-ignore
-  const isValidUET =
-    window.uetq && isValidPlan && typeof _otkBingConsent != 'undefined';
+  const isValidUET = window.uetq && isValidPlan && typeof _otkBingConsent != 'undefined';
   const adsStorage = {
     ad_storage: isMarketingOrAnalyticsAccepted ? 'granted' : 'denied',
   };
@@ -53,14 +53,12 @@ export function cstUpdateSklik(
   const retargetId = sklikId || null;
   const consent = isMarketingOrAnalyticsAccepted ? 1 : 0;
   //@ts-ignore
-  const appRetargetingConf =
-    typeof retargetingConf != 'undefined'
-      ? {
-          ...retargetingConf,
-          consent: consent,
-          rtgId: retargetId,
-        }
-      : {consent: consent, rtgId: retargetId};
+  const retargetingConf = window.retargetingConf ? window.retargetingConf : {consent: consent, rtgId: retargetId}
+  const appRetargetingConf = {
+    ...retargetingConf,
+    consent: consent,
+    rtgId: retargetId,
+  }
   if (isValidSklik) {
     //@ts-ignore
     window.rc.retargetingHit(appRetargetingConf);
@@ -109,6 +107,34 @@ export function cstUpdateGCM(allowList: string[], gcm: Gcm) {
     _gtag('set', 'ads_data_redaction', window.cstCookiesGCM.ads_data_redaction);
   window.cstCookiesGCM.url_passthrough &&
     _gtag('set', 'url_passthrough', window.cstCookiesGCM.url_passthrough);
+}
+
+export function cstUnblockScript(
+  allowed: string[],
+  isFromPlus = false,
+  isFromPremium = false,
+) {
+  const isAcceptedTracking =
+    allowed.includes(MARKETING) || allowed.includes(MARKETING);
+  if (
+    window.otBlockedStorage?.scripts?.length > 0 &&
+    (isFromPremium || isFromPlus) &&
+    isAcceptedTracking
+  ) {
+    for (const [index, node] of window.otBlockedStorage.scripts.entries()) {
+      console.log('INDEX', index);
+      const n = document.createElement('script');
+      n.type = node.type || 'application/javascript';
+      console.log('DEMO', node.src);
+      if (node.src) {
+        n.src = node.src;
+      } else {
+        n.textContent = node.textContent;
+      }
+      document.head.appendChild(n);
+    }
+    window.otBlockedStorage.scripts = [];
+  }
 }
 
 export function cstSetCookie(name: string, value: any, days?: number) {

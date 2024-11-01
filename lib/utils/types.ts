@@ -5,7 +5,22 @@ export interface TMetaObject {
 }
 
 export interface AutoBlockOption{
-
+    id: number;
+    shop: string;
+    shopId: string;
+    googleTag: boolean;
+    googleAnalytics: boolean;
+    fbPixel: boolean;
+    youtube: boolean;
+    vimeo: boolean;
+    googleAds: boolean;
+    tiktok: boolean;
+    twitter: boolean;
+    pinterest: boolean;
+    custom: boolean;
+    customInclude?: any;
+    shopify: boolean;
+    webPixel: boolean;
 }
 export enum ETypeEvent {
     declined = 'DECLINED',

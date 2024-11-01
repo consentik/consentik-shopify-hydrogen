@@ -303,4 +303,4 @@ export const LIST_LANGUAGES = [
   {value: 'zh-TW', label: 'Chinese (Traditional, Taiwan)'},
   {value: 'zu', label: 'Zulu'},
 ];
-export const GCM_DEFAULT_GRANTED_EVENT = `gtag("consent", "default", {ad_user_data: "granted",ad_personalization: "granted",ad_storage: "granted",analytics_storage: "granted",functionality_storage: "granted",personalization_storage: "granted",security_storage: "granted",wait_for_update: 500,cst_default: 'granted',})`
+export const GCM_DEFAULT_GRANTED_EVENT = `gtag("consent", "default", {ad_user_data: "granted",ad_personalization: "granted",ad_storage: "granted",analytics_storage: "granted",functionality_storage: "granted",personalization_storage: "granted",security_storage: "granted",wait_for_update: 500,cst_default: 'granted',})`;

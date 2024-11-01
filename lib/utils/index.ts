@@ -1,10 +1,5 @@
 import {LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {
-  Gcm,
-  GeoLocationInfo,
-  ImpressionData,
-  OptionalImpression,
-} from './types.ts';
+import {GeoLocationInfo, OptionalImpression} from './types.ts';
 import {CST_EU_COUNTRIES} from './data.ts';
 
 export const CST_KEY = {
@@ -161,13 +156,13 @@ export async function sendImpression(data: OptionalImpression) {
   try {
     // const params = new URLSearchParams({...data, dateCreated: new Date()});
     const queryParams = Object.keys(data)
-      .map((key) =>
-        Array.isArray(data[key])
-          ? data[key]
-              .map((value) => `${key}[]=${encodeURIComponent(value)}`)
+      .map((key: string) => {
+        const params = data[key as keyof OptionalImpression];
+        return Array.isArray(params) && params.length > 0
+          ? params.map((value) => `${key}[]=${encodeURIComponent(value)}`)
               .join('&')
-          : `${key}=${encodeURIComponent(data[key])}`,
-      )
+          : `${key}=${encodeURIComponent(String(params))}`;
+      })
       .join('&');
 
     return fetch(window.CST_ROOT_LINK + `/api/impression?${queryParams}`);

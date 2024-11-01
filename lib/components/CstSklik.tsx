@@ -1,23 +1,23 @@
 import * as React from 'react';
 import {Fragment} from 'react';
 import {Script} from '@shopify/hydrogen';
+import CustomScript from './CustomScript.tsx'
 
 const CstSKlik: React.FC<{nonce?: string; sklikId?: string}> = ({
   sklikId,
   nonce,
-}): React.JSX.Element => {
+}): React.JSX.Element | undefined => {
   if (!sklikId) {
     return;
   }
   return (
     <Fragment>
       <Script
-        strategy="beforeInteractive"
         nonce={nonce}
         type="text/javascript"
         src="https://c.seznam.cz/js/rc.js"
       />
-      <script
+      <CustomScript
         strategy="beforeInteractive"
         nonce={nonce}
         dangerouslySetInnerHTML={{

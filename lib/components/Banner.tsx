@@ -43,6 +43,7 @@ import {
   cstSendTracking,
   cstUpdateEUT,
   cstUpdateGCM,
+  cstUnblockScript,
   cstUpdateSklik,
   cstVariablesStyle,
 } from '../utils/core.ts';
@@ -167,6 +168,7 @@ const Banner: FC<IProps> = ({
             banner.setting.fromAdvanced,
           );
           cstUpdateSklik(allowed, banner.integration.sklik);
+          cstUnblockScript(allowed, banner.setting.fromPlus, banner.setting.fromAdvanced);
           setBannerShow('reopen');
           await onPushConsent({
             analytics: true,
@@ -190,6 +192,7 @@ const Banner: FC<IProps> = ({
             sale_of_data: false,
           });
           cstUpdateGCM(allowList, banner.integration.gcm);
+          cstUnblockScript(allowList, banner.setting.fromPlus, banner.setting.fromAdvanced);
           cstUpdateEUT(
             allowList,
             banner.setting.fromPlus,
