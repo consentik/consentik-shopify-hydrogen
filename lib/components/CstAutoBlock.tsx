@@ -6,7 +6,7 @@ interface TProp {
   option?: AutoBlockOption;
 }
 
-const CstAutoBlock: React.FC<TProp> = ({nonce, option}): React.JSX.Element => {
+const CstAutoBlock: React.FC<TProp> = ({nonce, option}): React.JSX.Element | undefined => {
   if (!option) {
     return;
   }

@@ -4,7 +4,6 @@ import FloatLayout from './FloatLayout';
 import FullLayout from './FullLayout';
 import {
   createContext,
-  CSSProperties,
   FC,
   Fragment,
   memo,
@@ -15,11 +14,8 @@ import {
 import {
   CST_KEY,
   getCookie,
-  getUserAgent,
   isTrue,
   loadConsentSaved,
-  otUpdateDuration,
-  sendImpression,
   setCookie,
 } from '../utils';
 import RenderIf from './RenderIf';
@@ -36,7 +32,6 @@ import {
 import CookieButton from './Buttons/CookieButton.tsx';
 import Preferences from './Preferences.tsx';
 import {
-  ConsentStatus,
   useCustomerPrivacy,
   VisitorConsent,
   VisitorConsentCollected,
@@ -45,14 +40,12 @@ import '../style.css';
 import {HOME_PATHS} from '../utils/data.ts';
 import {
   cstInitGPC,
-  cstSendGoogleConsent,
   cstSendTracking,
   cstUpdateEUT,
   cstUpdateGCM,
   cstUpdateSklik,
   cstVariablesStyle,
 } from '../utils/core.ts';
-import cstUET from './CstUET.tsx';
 
 interface TLoaderData {
   geo: GeoLocationInfo;
