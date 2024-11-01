@@ -1,8 +1,6 @@
 import * as React from 'react';
 import {IMetaField} from '../utils/types.ts';
 import {GCM_DEFAULT_GRANTED_EVENT, REGULATION_CONSENT} from '../utils/data.ts';
-import CustomScript from './CustomScript.tsx'
-
 interface IProps {
   nonce?: string;
   setting: IMetaField['setting'];
@@ -45,7 +43,7 @@ const CstGCM: React.FC<IProps> = ({
     .replace('DEFAULT_EVENT,', !!region ? GCM_DEFAULT_GRANTED_EVENT + ',' : '');
 
   return (
-    <CustomScript
+    <script
       strategy="beforeInteractive"
       nonce={nonce}
       dangerouslySetInnerHTML={{

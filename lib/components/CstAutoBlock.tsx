@@ -1,7 +1,5 @@
 import * as React from 'react';
 import {AutoBlockOption} from '../utils/types.ts';
-import CustomScript from './CustomScript.tsx';
-
 interface TProp {
   nonce?: string;
   option?: AutoBlockOption;
@@ -37,7 +35,7 @@ const CstAutoBlock: React.FC<TProp> = ({
     scriptList,
   )};${autoBlockTemplate}`;
   return (
-    <CustomScript
+    <script
       strategy="beforeInteractive"
       nonce={nonce}
       dangerouslySetInnerHTML={{

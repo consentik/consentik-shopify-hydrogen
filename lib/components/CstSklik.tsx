@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {Fragment} from 'react';
 import {Script} from '@shopify/hydrogen';
-import CustomScript from './CustomScript.tsx'
 
 const CstSKlik: React.FC<{nonce?: string; sklikId?: string}> = ({
   sklikId,
@@ -17,7 +16,7 @@ const CstSKlik: React.FC<{nonce?: string; sklikId?: string}> = ({
         type="text/javascript"
         src="https://c.seznam.cz/js/rc.js"
       />
-      <CustomScript
+      <script
         strategy="beforeInteractive"
         nonce={nonce}
         dangerouslySetInnerHTML={{

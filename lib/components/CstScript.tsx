@@ -2,10 +2,6 @@ import * as React from 'react';
 import {Fragment} from 'react';
 import {IMetaField} from '../utils/types.ts';
 import CstGCM from './CstGCM.tsx';
-import CstSklik from './CstSklik.tsx';
-import CstUET from './CstUET.tsx';
-import CstAutoBlock from './CstAutoBlock.tsx';
-
 interface IProps {
   nonce?: string;
   banner: IMetaField;
@@ -15,13 +11,13 @@ const CstScript: React.FC<IProps> = ({nonce, banner}): React.JSX.Element => {
   return (
     <Fragment>
       <style>{banner.setting.custom_css || ''}</style>
-      <CstAutoBlock
-        option={banner.integration.autoBlock}
-        nonce={nonce}
-      />
+      {/*<CstAutoBlock*/}
+      {/*  option={banner.integration.autoBlock}*/}
+      {/*  nonce={nonce}*/}
+      {/*/>*/}
       <CstGCM {...banner} nonce={nonce} />
-      <CstSklik sklikId={banner.integration?.sklik} nonce={nonce} />
-      <CstUET UET={banner.integration?.uet} nonce={nonce} />
+      {/*<CstSklik sklikId={banner.integration?.sklik} nonce={nonce} />*/}
+      {/*<CstUET UET={banner.integration?.uet} nonce={nonce} />*/}
       <script
         nonce={nonce}
         dangerouslySetInnerHTML={{
