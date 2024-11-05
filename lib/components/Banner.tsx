@@ -141,7 +141,7 @@ const Banner: FC<IProps> = ({
             ...allowed,
             sale_of_data: false,
           });
-          setCookieStorage([], banner.resetConsent?.current);
+          setCookieStorage([], banner.resetConsent);
           await sendTrackingImpression(ETypeEvent.declined);
           cstUpdateGCM([], banner.integration.gcm);
           cstUpdateEUT(
@@ -157,7 +157,7 @@ const Banner: FC<IProps> = ({
           const allowed = metafield?.cookieGroup?.category.map(
             (item: ICategory) => item.name_consent,
           );
-          setCookieStorage(allowed,banner.resetConsent?.current);
+          setCookieStorage(allowed,banner.resetConsent);
           cstUpdateGCM(allowed, banner.integration.gcm);
           cstUpdateEUT(
             allowed,
@@ -181,7 +181,7 @@ const Banner: FC<IProps> = ({
           break;
         }
         case 'allow': {
-          setCookieStorage(allowList, banner.resetConsent?.current);
+          setCookieStorage(allowList, banner.resetConsent);
           setBannerShow('reopen');
           await onPushConsent({
             analytics: allowList.includes('analytics'),

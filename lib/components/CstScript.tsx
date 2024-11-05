@@ -5,14 +5,14 @@ import CstGCM from './CstGCM.tsx';
 import RenderIf from './RenderIf.tsx'
 interface IProps {
   nonce?: string;
-  banner: IMetaField;
+  banner: IMetaField | undefined | null;
 }
 
 const CstScript: React.FC<IProps> = ({nonce, banner}): React.JSX.Element => {
     return (
     <Fragment>
      <RenderIf cond={!!banner}>
-         <style>{banner.setting?.custom_css || ''}</style>
+         <style>{banner?.setting?.custom_css || ''}</style>
          {/*<CstAutoBlock*/}
          {/*  option={banner.integration.autoBlock}*/}
          {/*  nonce={nonce}*/}

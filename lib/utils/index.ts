@@ -1,5 +1,5 @@
 import {LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {GeoLocationInfo, OptionalImpression} from './types.ts';
+import {GeoLocationInfo, IMetaField, OptionalImpression} from './types.ts';
 import {CST_EU_COUNTRIES} from './data.ts';
 
 export const CST_KEY = {
@@ -269,12 +269,18 @@ export const isMatchRegion = (geo: GeoLocationInfo, region: string) => {
       return false; // Default case if none of the regions match.
   }
 };
-export const setCookieStorage = (allowed: string[], version?: string) => {
+export const setCookieStorage = (
+  allowed: string[],
+  resetConsent?: IMetaField['resetConsent'],
+) => {
   setCookie(CST_KEY.ALLOW_KEY, JSON.stringify({categoriesSelected: allowed}));
   setCookie(
-    version || '_consentik_cookie',
+    resetConsent?.current || '_consentik_cookie',
     JSON.stringify({categoriesSelected: allowed}),
   );
+  if (resetConsent?.oldKey) {
+    clearCookie(resetConsent.oldKey);
+  }
 };
 export const loadConsentSaved = (): {
   categoriesSelected: string[];
