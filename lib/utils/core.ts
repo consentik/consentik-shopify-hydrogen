@@ -16,6 +16,7 @@ const NECESSARY = 'necessary';
 const PREFERENCE = 'preferences';
 
 function _gtag(...args: any[]) {
+  window.dataLayer = window.dataLayer || []
   window.dataLayer.push(args);
 }
 
@@ -34,6 +35,7 @@ export function cstUpdateEUT(
   };
   const cookieVal = isMarketingOrAnalyticsAccepted ? 0 : 1;
   if (isValidUET) {
+    window.uetq = window.uetq || [];
     window.uetq.push('consent', 'update', adsStorage);
     cstSetCookie('_uetmsdns', cookieVal);
   }
@@ -122,10 +124,8 @@ export function cstUnblockScript(
     isAcceptedTracking
   ) {
     for (const [index, node] of window.otBlockedStorage.scripts.entries()) {
-      console.log('INDEX', index);
       const n = document.createElement('script');
       n.type = node.type || 'application/javascript';
-      console.log('DEMO', node.src);
       if (node.src) {
         n.src = node.src;
       } else {
