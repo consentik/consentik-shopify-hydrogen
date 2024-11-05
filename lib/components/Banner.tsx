@@ -76,6 +76,9 @@ const Banner: FC<IProps> = ({
   storeLang,
   consent,
 }) => {
+  if (!banner.setting) {
+    return <></>;
+  }
   // const {banner, consent} = useLoaderData<TLoaderData>();
   const {customerPrivacy} = useCustomerPrivacy({
     storefrontAccessToken: consent.storefrontAccessToken,
@@ -168,7 +171,11 @@ const Banner: FC<IProps> = ({
             banner.setting.fromAdvanced,
           );
           cstUpdateSklik(allowed, banner.integration.sklik);
-          cstUnblockScript(allowed, banner.setting.fromPlus, banner.setting.fromAdvanced);
+          cstUnblockScript(
+            allowed,
+            banner.setting.fromPlus,
+            banner.setting.fromAdvanced,
+          );
           setBannerShow('reopen');
           await onPushConsent({
             analytics: true,
@@ -192,7 +199,11 @@ const Banner: FC<IProps> = ({
             sale_of_data: false,
           });
           cstUpdateGCM(allowList, banner.integration.gcm);
-          cstUnblockScript(allowList, banner.setting.fromPlus, banner.setting.fromAdvanced);
+          cstUnblockScript(
+            allowList,
+            banner.setting.fromPlus,
+            banner.setting.fromAdvanced,
+          );
           cstUpdateEUT(
             allowList,
             banner.setting.fromPlus,

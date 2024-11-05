@@ -159,7 +159,8 @@ export async function sendImpression(data: OptionalImpression) {
       .map((key: string) => {
         const params = data[key as keyof OptionalImpression];
         return Array.isArray(params) && params.length > 0
-          ? params.map((value) => `${key}[]=${encodeURIComponent(value)}`)
+          ? params
+              .map((value) => `${key}[]=${encodeURIComponent(value)}`)
               .join('&')
           : `${key}=${encodeURIComponent(String(params))}`;
       })
@@ -216,16 +217,18 @@ export async function loadMetaObject({context}: LoaderFunctionArgs) {
       },
     );
     const shop = node.primaryDomain.host;
-    const metafield = metaobject.field?.value
-      ? JSON.parse(metaobject.field.value)
-      : {};
+    console.log('metaobject', metaobject);
+    const metafield =
+      metaobject && metaobject.field?.value
+        ? JSON.parse(metaobject.field.value)
+        : {};
 
-    const geo = await getGeoRegion(metafield.setting?.shop);
+    const geo = await getGeoRegion(metafield?.setting?.shop);
     const storeLang = localization.language.isoCode.toLowerCase();
 
-    const appEnabled = isTrue(metafield.setting?.app_enable);
-    const isShowAllRegion = isTrue(metafield.setting.show_all);
-    const listRegions = metafield.setting.show_specific_region || [];
+    const appEnabled = metafield && isTrue(metafield.setting?.app_enable);
+    const isShowAllRegion = metafield && isTrue(metafield.setting?.show_all);
+    const listRegions = metafield?.setting?.show_specific_region || [];
 
     if (
       (!geo.region && listRegions?.includes(CALIFORNIA)) ||
