@@ -123,7 +123,7 @@ export function cstUnblockScript(
     (isFromPremium || isFromPlus) &&
     isAcceptedTracking
   ) {
-    for (const [index, node] of window.otBlockedStorage.scripts.entries()) {
+    for (const [, node] of window.otBlockedStorage.scripts.entries()) {
       const n = document.createElement('script');
       n.type = node.type || 'application/javascript';
       if (node.src) {
