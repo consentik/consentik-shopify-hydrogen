@@ -49,8 +49,15 @@ export interface IMetaField {
     canShowBanner: boolean;
     setting: IBanner;
     integration: IIntegration;
+    resetConsent: IResetConsent;
     languages: ILanguage;
     cookieGroup: { category: ICategory[]; cookies: ICookie[] };
+}
+interface IResetConsent {
+    "oldKey": string,
+    "current": string,
+    "type": "all" | "custom",
+    "consent": string[]
 }
 interface IIntegration {
     sklik: string;

@@ -1,10 +1,14 @@
 import {CustomerPrivacy} from '@shopify/hydrogen';
 import {ETypeEvent, Gcm, GeoLocationInfo, IMetaField} from './types.ts';
 import {
+  clearCookie,
+  CST_KEY,
+  getCookie,
   getUserAgent,
   isTrue,
   otUpdateDuration,
   sendImpression,
+  setCookie,
 } from './index.ts';
 import {CSSProperties} from 'react';
 
@@ -16,7 +20,7 @@ const NECESSARY = 'necessary';
 const PREFERENCE = 'preferences';
 
 function _gtag(...args: any[]) {
-  window.dataLayer = window.dataLayer || []
+  window.dataLayer = window.dataLayer || [];
   window.dataLayer.push(args);
 }
 
@@ -29,7 +33,8 @@ export function cstUpdateEUT(
     allowList.includes(MARKETING) || allowList.includes(ANALYTICS);
   const isValidPlan = isFromPremium || isFromAdvanced;
   //@ts-ignore
-  const isValidUET = window.uetq && isValidPlan && typeof _otkBingConsent != 'undefined';
+  const isValidUET =
+    window.uetq && isValidPlan && typeof _otkBingConsent != 'undefined';
   const adsStorage = {
     ad_storage: isMarketingOrAnalyticsAccepted ? 'granted' : 'denied',
   };
@@ -55,12 +60,14 @@ export function cstUpdateSklik(
   const retargetId = sklikId || null;
   const consent = isMarketingOrAnalyticsAccepted ? 1 : 0;
   //@ts-ignore
-  const retargetingConf = window.retargetingConf ? window.retargetingConf : {consent: consent, rtgId: retargetId}
+  const retargetingConf = window.retargetingConf
+    ? window.retargetingConf
+    : {consent: consent, rtgId: retargetId};
   const appRetargetingConf = {
     ...retargetingConf,
     consent: consent,
     rtgId: retargetId,
-  }
+  };
   if (isValidSklik) {
     //@ts-ignore
     window.rc.retargetingHit(appRetargetingConf);
@@ -125,7 +132,7 @@ export function cstUnblockScript(
   ) {
     for (const [index, node] of window.otBlockedStorage.scripts.entries()) {
       const n = document.createElement('script');
-      n.id = `script-item-${index}`
+      n.id = `script-item-${index}`;
       n.type = node.type || 'application/javascript';
       if (node.src) {
         n.src = node.src;
@@ -151,6 +158,30 @@ export function cstSetCookie(name: string, value: any, days?: number) {
   date.setTime(date.getTime() + expiredDate * 24 * 60 * 60 * 1000);
   expires = '; expires=' + date.toUTCString();
   document.cookie = name + '=' + value + expires + '; path=/';
+}
+
+export function resetConsent(restConsent: IMetaField['resetConsent']) {
+  console.log({restConsent})
+  const isResetAll = restConsent.type === 'all';
+  const oldCookies = getCookie(restConsent.oldKey)
+  if(!oldCookies){
+    return;
+  }
+  const consentToReset = restConsent?.consent ?? [];
+  const currentAllowed = JSON.parse(oldCookies);
+
+  if (currentAllowed) {
+    const oldCookieList = currentAllowed?.categoriesSelected || [];
+    const shouldReset = oldCookieList.some((item) => consentToReset.includes(item));
+
+    clearCookie(restConsent.oldKey);
+    clearCookie(CST_KEY.ALLOW_KEY);
+
+    if (!shouldReset && !isResetAll) {
+      setCookie(restConsent.current, JSON.stringify(currentAllowed));
+      setCookie(CST_KEY.ALLOW_KEY, JSON.stringify(currentAllowed));
+    }
+  }
 }
 
 export function cstInitGPC(customerPrivacy: CustomerPrivacy) {
@@ -197,7 +228,10 @@ export async function cstSendTracking(
     type == ETypeEvent.show
       ? {}
       : {
-          category: allowList?.length === 0 ? [] : allowList,
+          category:
+            allowList?.length === 0
+              ? [NECESSARY]
+              : [...new Set([...allowList, NECESSARY])],
           ip: geo.ip,
           dur: duration,
         };

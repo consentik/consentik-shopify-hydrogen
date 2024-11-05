@@ -103,6 +103,9 @@
   &-checkbox:checked + &-label {
     .cst-toggle-switch-inner {
       margin-left: 0;
+      &:before{
+        background-color: var(--colorName);
+      }
     }
 
     .cst-toggle-switch-switch {
