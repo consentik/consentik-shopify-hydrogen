@@ -23,10 +23,10 @@ export interface AutoBlockOption{
     webPixel: boolean;
 }
 export enum ETypeEvent {
-    declined = 'DECLINED',
-    show = 'SHOW',
-    accepted = 'ACCEPTED',
-    accepted_partial = 'ACCEPTED_PARTIAL',
+    declined = 'declined',
+    show = 'show',
+    accepted = 'accepted',
+    accepted_partial = 'accepted_partial',
 }
 
 export interface ImpressionData {
