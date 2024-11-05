@@ -12,7 +12,7 @@ const CstUET: React.FC<IProps> = ({UET, nonce}): React.JSX.Element => {
   }
   return (
     <script
-      strategy="beforeInteractive"
+      // strategy="beforeInteractive"
       nonce={nonce}
       dangerouslySetInnerHTML={{
         __html: content,

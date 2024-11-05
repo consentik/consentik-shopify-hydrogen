@@ -185,7 +185,7 @@ export function otUpdateDuration() {
 export async function loadMetaObject({context}: LoaderFunctionArgs) {
   try {
     const {storefront, env} = context as any;
-    const metaID = env.PUBLIC_METAOBJECT_ID;
+    const metaID = env.PUBLIC_CST_METAOBJECT_ID;
     const shopId = env.SHOP_ID;
     const OBJECT_QUERY = `#graphql
         query {

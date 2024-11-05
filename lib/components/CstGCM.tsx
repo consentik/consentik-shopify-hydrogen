@@ -44,7 +44,7 @@ const CstGCM: React.FC<IProps> = ({
 
   return (
     <script
-      strategy="beforeInteractive"
+      // strategy="beforeInteractive"
       nonce={nonce}
       dangerouslySetInnerHTML={{
         __html: `window['otkConsent']=${JSON.stringify(

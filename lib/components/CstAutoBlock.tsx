@@ -36,7 +36,7 @@ const CstAutoBlock: React.FC<TProp> = ({
   )};${autoBlockTemplate}`;
   return (
     <script
-      strategy="beforeInteractive"
+      // strategy="beforeInteractive"
       nonce={nonce}
       dangerouslySetInnerHTML={{
         __html: config,
