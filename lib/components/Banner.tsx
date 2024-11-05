@@ -17,6 +17,7 @@ import {
   isTrue,
   loadConsentSaved,
   setCookie,
+  setCookieStorage,
 } from '../utils';
 import RenderIf from './RenderIf';
 import {
@@ -46,6 +47,7 @@ import {
   cstUnblockScript,
   cstUpdateSklik,
   cstVariablesStyle,
+  resetConsent,
 } from '../utils/core.ts';
 
 interface TLoaderData {
@@ -139,10 +141,7 @@ const Banner: FC<IProps> = ({
             ...allowed,
             sale_of_data: false,
           });
-          setCookie(
-            CST_KEY.ALLOW_KEY,
-            JSON.stringify({categoriesSelected: []}),
-          );
+          setCookieStorage([], banner.resetConsent?.current);
           await sendTrackingImpression(ETypeEvent.declined);
           cstUpdateGCM([], banner.integration.gcm);
           cstUpdateEUT(
@@ -158,12 +157,7 @@ const Banner: FC<IProps> = ({
           const allowed = metafield?.cookieGroup?.category.map(
             (item: ICategory) => item.name_consent,
           );
-          setCookie(
-            CST_KEY.ALLOW_KEY,
-            JSON.stringify({
-              categoriesSelected: allowed,
-            }),
-          );
+          setCookieStorage(allowed,banner.resetConsent?.current);
           cstUpdateGCM(allowed, banner.integration.gcm);
           cstUpdateEUT(
             allowed,
@@ -187,10 +181,7 @@ const Banner: FC<IProps> = ({
           break;
         }
         case 'allow': {
-          setCookie(
-            CST_KEY.ALLOW_KEY,
-            JSON.stringify({categoriesSelected: allowList}),
-          );
+          setCookieStorage(allowList, banner.resetConsent?.current);
           setBannerShow('reopen');
           await onPushConsent({
             analytics: allowList.includes('analytics'),
@@ -223,7 +214,7 @@ const Banner: FC<IProps> = ({
           break;
       }
     },
-    [allowList, metafield?.cookieGroup],
+    [allowList, metafield?.cookieGroup, banner.resetConsent],
   );
   const onSelection = useCallback(
     (name: string, checked: boolean) => {
@@ -274,12 +265,18 @@ const Banner: FC<IProps> = ({
   }, [showBanner, banner.setting.advanced.preferences_opts]);
 
   useEffect(() => {
+    window.CACHE_TIME = Number(banner.setting.cache_time);
+    window.CST_ROOT_LINK = banner.setting.rootLink;
+    if (banner.resetConsent) {
+      if (banner.setting.isPremium || banner.setting.fromAdvanced) {
+        resetConsent(banner.resetConsent);
+      }
+    }
+
     if (banner.setting.isPaid && isTrue(banner.setting.advanced.gpc)) {
       //@ts-ignore
       cstInitGPC(customerPrivacy);
     }
-
-    window.CST_ROOT_LINK = banner.setting.rootLink;
     const path = encodeURI(window.location.pathname);
     const [_, page] = path.split('/');
     switch (page) {

@@ -9,7 +9,6 @@ interface IProps {
 }
 
 const CstScript: React.FC<IProps> = ({nonce, banner}): React.JSX.Element => {
-    console.log('BANNER', banner)
     return (
     <Fragment>
      <RenderIf cond={!!banner}>

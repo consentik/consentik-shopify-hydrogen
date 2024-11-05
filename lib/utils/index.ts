@@ -5,6 +5,7 @@ import {CST_EU_COUNTRIES} from './data.ts';
 export const CST_KEY = {
   LANGUAGE: '_consentik_s_lang',
   ALLOW_KEY: 'cookiesNotification',
+  ALLOW_KEY_VERSION: '_consentik_cookie_',
 };
 const EU = 'eu';
 const CALIFORNIA = 'california';
@@ -46,7 +47,9 @@ export const setCookie = (name: string, value: any, days?: number) => {
   expires = '; expires=' + date.toUTCString();
   document.cookie = name + '=' + value + expires + '; path=/';
 };
-export const clearCookie = () => {};
+export const clearCookie = (name: string) => {
+  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+};
 
 export const getGeoRegion = async (shop: string): Promise<GeoLocationInfo> => {
   try {
@@ -265,6 +268,13 @@ export const isMatchRegion = (geo: GeoLocationInfo, region: string) => {
     default:
       return false; // Default case if none of the regions match.
   }
+};
+export const setCookieStorage = (allowed: string[], version?: string) => {
+  setCookie(CST_KEY.ALLOW_KEY, JSON.stringify({categoriesSelected: allowed}));
+  setCookie(
+    version || '_consentik_cookie',
+    JSON.stringify({categoriesSelected: allowed}),
+  );
 };
 export const loadConsentSaved = (): {
   categoriesSelected: string[];
