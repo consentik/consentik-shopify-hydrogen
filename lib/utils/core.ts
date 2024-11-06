@@ -172,7 +172,7 @@ export function resetConsent(restConsent: IMetaField['resetConsent']) {
 
   if (currentAllowed) {
     const oldCookieList = currentAllowed?.categoriesSelected || [];
-    const shouldReset = oldCookieList.some((item) => consentToReset.includes(item));
+    const shouldReset = oldCookieList.some((item: string) => consentToReset.includes(item));
 
     clearCookie(restConsent.oldKey);
     clearCookie(CST_KEY.ALLOW_KEY);
@@ -231,7 +231,7 @@ export async function cstSendTracking(
           category:
             allowList?.length === 0
               ? [NECESSARY]
-              : [...new Set([...allowList, NECESSARY])],
+              : [...new Set([...(allowList || []), NECESSARY])],
           ip: geo.ip,
           dur: duration,
         };
